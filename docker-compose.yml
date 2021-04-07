@@ -1,16 +1,44 @@
-version: "3.2"
+version: '3.2'
+
 services:
+  corretora:
+    image: nestmicroservices/corretora:${TAG:-latest}
+    build:
+      context: ./corretora
+      dockerfile: Dockerfile
+    environment:
+      - ENV=development
+    ports:
+      - '10002:10002'
+    depends_on:
+      - rabbitmq
+
+  bolsa-de-valores:
+    image: nestmicroservices/bolsa-de-valores:${TAG:-latest}
+    build:
+      context: ./bolsa-de-valores
+      dockerfile: Dockerfile
+    environment:
+      - ENV=development
+    ports:
+      - '10003:10003'
+    depends_on:
+      - rabbitmq
+
   rabbitmq:
     image: rabbitmq:3-management-alpine
     container_name: 'rabbitmq'
     ports:
-        - 5672:5672
-        - 15672:15672
+      - 5672:5672
+      - 15672:15672
     volumes:
-        - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
-        - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
     networks:
-        - rabbitmq_go_net
+      - rabbitmq_go_net
+
+volumes:
+  data:
 
 networks:
   rabbitmq_go_net:

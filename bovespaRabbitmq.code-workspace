@@ -1,0 +1,14 @@
+{
+  "folders": [
+    {
+      "path": "./api-getway"
+    },
+    {
+      "path": "./corretora"
+    },
+    {
+      "path": "./bolsa-de-valores"
+    }
+  ],
+  "settings": {}
+}
