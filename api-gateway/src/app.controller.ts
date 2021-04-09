@@ -1,4 +1,4 @@
-import { Controller, Param, Post } from '@nestjs/common';
+import { Controller, Param, Post } from '@nestjs/common/decorators';
 import {
   ClientProxy,
   ClientProxyFactory,
@@ -12,14 +12,14 @@ export class AppController {
     this.corretoraProxy = ClientProxyFactory.create({
       transport: Transport.RMQ,
       options: {
-        urls: ['amqp://guest:guest@localhost:5672/cliente-corretora'],
+        urls: ['amqp://guest:guest@rabbitmq:5672/bovespa'],
+        queue: 'corretora',
       },
     });
   }
 
   @Post(':text')
-  saySomething(@Param('text') text: string): string {
-    this.corretoraProxy.emit('say-something', text);
-    return text;
+  saySomething(@Param('text') text: string) {
+    return this.corretoraProxy.send('compra', text);
   }
 }

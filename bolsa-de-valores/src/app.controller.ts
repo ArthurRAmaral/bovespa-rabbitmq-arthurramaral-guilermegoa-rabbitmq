@@ -1,30 +1,19 @@
-import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service';
+import { Controller, Logger } from '@nestjs/common';
 import {
-  ClientProxy,
-  ClientProxyFactory,
-  Transport,
-  MessagePattern,
   Payload,
   Ctx,
   RmqContext,
+  MessagePattern,
 } from '@nestjs/microservices';
 
 @Controller()
 export class AppController {
-  corretoraProxy: ClientProxy;
-
-  constructor(private readonly appService: AppService) {
-    this.corretoraProxy = ClientProxyFactory.create({
-      transport: Transport.RMQ,
-      options: {
-        urls: ['amqp://guest:guest@localhost:5672/cliente-corretora'],
-      },
-    });
-  }
+  private readonly logger = new Logger(AppController.name);
 
   @MessagePattern('compra')
-  getNotifications(@Payload() data: number[], @Ctx() context: RmqContext) {
-    console.log(`Pattern: ${context.getPattern()}`);
+  compra(@Payload() data: any, @Ctx() context: RmqContext) {
+    this.logger.log(`Pattern: ${context.getPattern()}`);
+    this.logger.log(`Payload: ${data}`);
+    return 'recebido';
   }
 }

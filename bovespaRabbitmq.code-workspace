@@ -1,14 +1,20 @@
 {
   "folders": [
     {
-      "path": "./api-getway"
+      "name": "API Gateway",
+      "path": "./api-gateway"
     },
     {
+      "name": "Corretora",
       "path": "./corretora"
     },
     {
+      "name": "Bolsa de valores",
       "path": "./bolsa-de-valores"
+    },
+    {"name":"Raiz",
+      "path": "./"
     }
   ],
-  "settings": {}
+  "settings": {"editor.formatOnSave": true}
 }

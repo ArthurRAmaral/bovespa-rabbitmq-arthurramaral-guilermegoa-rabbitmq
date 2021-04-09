@@ -1,45 +1,50 @@
 version: '3.2'
 
 services:
-  corretora:
-    image: nestmicroservices/corretora:${TAG:-latest}
-    build:
-      context: ./corretora
-      dockerfile: Dockerfile
-    environment:
-      - ENV=development
+  api-gateway:
+    image: bovespa/api-gateway:${TAG:-latest}
+    build: ./api-gateway
+    volumes:
+      - ./api-gateway:/home/node/app
     ports:
-      - '10002:10002'
+      - '3333:3333'
+    depends_on:
+      - rabbitmq
+
+  corretora:
+    image: bovespa/corretora:${TAG:-latest}
+    build: ./corretora
+    volumes:
+      - ./corretora:/home/node/app
     depends_on:
       - rabbitmq
 
   bolsa-de-valores:
-    image: nestmicroservices/bolsa-de-valores:${TAG:-latest}
-    build:
-      context: ./bolsa-de-valores
-      dockerfile: Dockerfile
-    environment:
-      - ENV=development
-    ports:
-      - '10003:10003'
+    image: bovespa/bolsa-de-valores:${TAG:-latest}
+    build: ./bolsa-de-valores
+    volumes:
+      - ./bolsa-de-valores:/home/node/app
     depends_on:
       - rabbitmq
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
+    logging:
+      driver: none
     container_name: 'rabbitmq'
     ports:
       - 5672:5672
       - 15672:15672
     volumes:
-      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
-      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
-    networks:
-      - rabbitmq_go_net
+      - rabbitmq-data:/var/lib/rabbitmq/
+      - rabbitmq-log:/var/log/rabbitmq
 
 volumes:
-  data:
+  rabbitmq-data:
+    name: rmqdata
+  rabbitmq-log:
+    # name: rmqlog
 
 networks:
-  rabbitmq_go_net:
-    driver: bridge
+  default:
+    name: rabbitmq
