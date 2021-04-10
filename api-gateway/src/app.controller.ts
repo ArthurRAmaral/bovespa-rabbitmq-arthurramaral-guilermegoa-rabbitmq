@@ -6,6 +6,7 @@ import {
   Transport,
 } from '@nestjs/microservices';
 import { CompraDto } from './dto/compra.dto';
+import { VendaDto } from './dto/venda.dto';
 
 @Controller('api')
 export class AppController {
@@ -19,6 +20,9 @@ export class AppController {
       options: {
         urls: ['amqp://guest:guest@rabbitmq:5672/bovespa'],
         queue: 'corretora',
+        queueOptions: {
+          durable: true,
+        },
       },
     });
 
@@ -27,13 +31,22 @@ export class AppController {
       options: {
         urls: ['amqp://guest:guest@rabbitmq:5672/bovespa'],
         queue: 'bolsa-de-valores',
+        queueOptions: {
+          durable: true,
+        },
       },
     });
   }
 
   @Post('compra')
   compra(@Body() compraDto: CompraDto) {
-    this.logger.log('compra', compraDto.nome);
+    this.logger.log('compra', compraDto.corretora);
     return this.corretoraProxy.send('compra', compraDto);
+  }
+
+  @Post('venda')
+  venda(@Body() vendaDto: VendaDto) {
+    this.logger.log('venda', vendaDto.corretora);
+    return this.corretoraProxy.send('venda', vendaDto);
   }
 }

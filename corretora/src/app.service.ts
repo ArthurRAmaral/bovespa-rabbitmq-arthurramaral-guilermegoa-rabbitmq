@@ -1,4 +1,5 @@
 import { CompraDto } from './dto/compra.dto';
+import { VendaDto } from './dto/venda.dto';
 import { Injectable, Logger } from '@nestjs/common';
 import {
   ClientProxy,
@@ -17,12 +18,20 @@ export class AppService {
       options: {
         urls: ['amqp://guest:guest@rabbitmq:5672/bovespa'],
         queue: 'bolsa-de-valores',
+        queueOptions: {
+          durable: true,
+        },
       },
     });
   }
 
   compra(compraDto: CompraDto) {
-    this.logger.log('Passou no service');
+    this.logger.log('venda', compraDto.corretora);
     return this.bolsaDeValoresProxy.send('compra', compraDto);
+  }
+
+  venda(vendaDto: VendaDto) {
+    this.logger.log('venda', vendaDto.corretora);
+    return this.bolsaDeValoresProxy.send('venda', vendaDto);
   }
 }

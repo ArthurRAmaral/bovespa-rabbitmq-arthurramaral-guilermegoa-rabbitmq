@@ -1,5 +1,6 @@
 import { CompraDto } from './dto/compra.dto';
 import { Injectable, Logger } from '@nestjs/common';
+import { VendaDto } from './dto/venda.dto';
 
 @Injectable()
 export class AppService {
@@ -9,6 +10,12 @@ export class AppService {
   compra(compraDto: CompraDto): string {
     this.logger.log('Passou no service');
     this.livroDeOfertas.compras.push(compraDto);
-    return `Registrado ${this.livroDeOfertas.compras.length}`;
+    return `Compra registrada ${this.livroDeOfertas.compras.length}`;
+  }
+
+  venda(vendaDto: VendaDto): string {
+    this.logger.log('Passou no service');
+    this.livroDeOfertas.vendas.push(vendaDto);
+    return `Venda registrada ${this.livroDeOfertas.vendas.length}`;
   }
 }

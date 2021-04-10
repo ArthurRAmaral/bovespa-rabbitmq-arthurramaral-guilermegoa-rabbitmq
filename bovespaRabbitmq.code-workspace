@@ -5,12 +5,12 @@
       "path": "./api-gateway"
     },
     {
-      "name": "Corretora",
-      "path": "./corretora"
-    },
-    {
       "name": "Bolsa de valores",
       "path": "./bolsa-de-valores"
+    },
+    {
+      "name": "Corretora",
+      "path": "./corretora"
     },
     {"name":"Raiz",
       "path": "./"

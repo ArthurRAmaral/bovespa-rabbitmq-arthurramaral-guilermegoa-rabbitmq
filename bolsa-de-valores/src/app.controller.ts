@@ -2,6 +2,7 @@ import { AppService } from './app.service';
 import { CompraDto } from './dto/compra.dto';
 import { Controller, Logger } from '@nestjs/common';
 import { Payload, MessagePattern } from '@nestjs/microservices';
+import { VendaDto } from './dto/venda.dto';
 
 @Controller()
 export class AppController {
@@ -12,5 +13,10 @@ export class AppController {
   @MessagePattern('compra')
   compra(@Payload() compraDto: CompraDto) {
     return this.appService.compra(compraDto);
+  }
+
+  @MessagePattern('venda')
+  venda(@Payload() vendaDto: VendaDto) {
+    return this.appService.venda(vendaDto);
   }
 }
