@@ -16,5 +16,6 @@
       "path": "./"
     }
   ],
-  "settings": {"editor.formatOnSave": true}
+  "settings": {"editor.formatOnSave": true
+  ,"workbench.colorTheme": "GitHub Dark"}
 }

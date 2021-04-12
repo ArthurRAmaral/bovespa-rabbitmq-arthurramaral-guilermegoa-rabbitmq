@@ -2,7 +2,7 @@ version: '3.2'
 
 services:
   api-gateway:
-    image: bovespa/api-gateway:${TAG:-latest}
+    image: api-gateway
     build: ./api-gateway
     volumes:
       - ./api-gateway:/home/node/app
@@ -12,7 +12,7 @@ services:
       - rabbitmq
 
   corretora:
-    image: bovespa/corretora:${TAG:-latest}
+    image: corretora
     build: ./corretora
     volumes:
       - ./corretora:/home/node/app
@@ -20,7 +20,7 @@ services:
       - rabbitmq
 
   bolsa-de-valores:
-    image: bovespa/bolsa-de-valores:${TAG:-latest}
+    image: bolsa-de-valores
     build: ./bolsa-de-valores
     volumes:
       - ./bolsa-de-valores:/home/node/app
@@ -43,7 +43,7 @@ volumes:
   rabbitmq-data:
     name: rmqdata
   rabbitmq-log:
-    # name: rmqlog
+    name: rmqlog
 
 networks:
   default:
