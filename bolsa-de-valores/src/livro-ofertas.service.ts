@@ -13,15 +13,17 @@ export class LivroOfertasService {
   Lista_de_transacoes: TransacaoDto[] = [];
 
   verificaCompra(compra: CompraDto, ativo: string): TransacaoDto[] {
-    const lista_ativo = this.Map_de_venda.get(ativo);
-    let transacoes: TransacaoDto[];
+    const lista_ativo_venda = this.Map_de_venda.get(ativo);
 
-    if (!lista_ativo.length) {
-      this.Map_de_compra.set(ativo, [compra]);
+    if (!lista_ativo_venda) {
+      const lista_ativo_compra = this.Map_de_compra.get(ativo);
+      lista_ativo_compra ? lista_ativo_compra.push(compra) : this.Map_de_compra.set(ativo, [compra]);
       return [];
     }
 
-    lista_ativo.forEach((venda) => {
+    let transacoes: TransacaoDto[] = [];
+
+    lista_ativo_venda.forEach((venda) => {
       if (
         !this.ocorreTransacao(compra.valor, venda.valor) &&
         compra.quantidade
@@ -44,14 +46,17 @@ export class LivroOfertasService {
   }
 
   verificaVenda(venda: VendaDto, ativo: string): TransacaoDto[] {
-    const lista_ativo = this.Map_de_compra.get(ativo);
-    let transacoes: TransacaoDto[];
+    const lista_ativo_compra = this.Map_de_compra.get(ativo);
 
-    if (!lista_ativo.length) {
+    if (!lista_ativo_compra) {
+      const lista_ativo_venda = this.Map_de_venda.get(ativo);
+      lista_ativo_venda ? lista_ativo_venda.push(venda) : this.Map_de_venda.set(ativo, [venda]);
       return [];
     }
 
-    lista_ativo.forEach((compra) => {
+    let transacoes: TransacaoDto[] = [];
+
+    lista_ativo_compra.forEach((compra) => {
       if (
         !this.ocorreTransacao(compra.valor, compra.valor) &&
         compra.quantidade

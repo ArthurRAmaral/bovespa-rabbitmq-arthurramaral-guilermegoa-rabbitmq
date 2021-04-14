@@ -6,33 +6,16 @@ import { LivroOfertasService } from './livro-ofertas.service';
 @Injectable()
 export class AppService {
   logger = new Logger(AppService.name);
-  constructor(private livroDeOfertas: LivroOfertasService) {}
 
-  compra(compraDto: CompraDto): string {
-    this.logger.log('Passou no service');
-    const transacoes = this.livroDeOfertas.verificaCompra(
-      compraDto,
-      compraDto.ativo,
-    );
+  constructor(private livroDeOfertas: LivroOfertasService) { }
 
-    if (transacoes.length) {
-      return `Compra efetuda ${transacoes.length}`;
-    }
-    
-    return `Compra registrada`;
+  compra(compraDto: CompraDto) {
+    this.livroDeOfertas.verificaCompra(compraDto, compraDto.ativo);
+    return this.livroDeOfertas
   }
 
-  venda(vendaDto: VendaDto): string {
-    this.logger.log('Passou no service');
-    const transacoes = this.livroDeOfertas.verificaVenda(
-      vendaDto,
-      vendaDto.ativo,
-    );
-
-    if (transacoes.length) {
-      return `Venda efetuda ${transacoes.length}`;
-    }
-
-    return `Venda registrada`;
+  venda(vendaDto: VendaDto) {
+    this.livroDeOfertas.verificaVenda(vendaDto, vendaDto.ativo);
+    return this.livroDeOfertas
   }
 }

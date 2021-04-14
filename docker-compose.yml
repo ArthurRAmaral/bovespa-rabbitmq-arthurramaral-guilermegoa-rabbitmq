@@ -1,19 +1,11 @@
 version: '3.2'
 
 services:
-  api-gateway:
-    image: api-gateway
-    build: ./api-gateway
-    volumes:
-      - ./api-gateway:/home/node/app
-    ports:
-      - '3333:3333'
-    depends_on:
-      - rabbitmq
-
   corretora:
     image: corretora
     build: ./corretora
+    ports:
+      - 3333:3333
     volumes:
       - ./corretora:/home/node/app
     depends_on:

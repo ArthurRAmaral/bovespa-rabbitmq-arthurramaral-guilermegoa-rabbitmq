@@ -26,11 +26,13 @@ export class AppService {
   }
 
   compra(compraDto: CompraDto) {
+    compraDto.corretora = "CORRETORA"
     this.logger.log('compra', compraDto.corretora);
     return this.bolsaDeValoresProxy.send('compra', compraDto);
   }
 
   venda(vendaDto: VendaDto) {
+    vendaDto.corretora = "CORRETORA"
     this.logger.log('venda', vendaDto.corretora);
     return this.bolsaDeValoresProxy.send('venda', vendaDto);
   }

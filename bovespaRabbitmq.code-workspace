@@ -1,10 +1,6 @@
 {
   "folders": [
     {
-      "name": "API Gateway",
-      "path": "./api-gateway"
-    },
-    {
       "name": "Bolsa de valores",
       "path": "./bolsa-de-valores"
     },

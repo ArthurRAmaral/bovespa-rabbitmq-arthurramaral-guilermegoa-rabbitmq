@@ -6,16 +6,7 @@ import { AppModule } from './app.module';
 const logger = new Logger('Main');
 
 async function bootstrap() {
-  const app = await NestFactory.createMicroservice(AppModule, {
-    transport: Transport.RMQ,
-    options: {
-      urls: ['amqp://guest:guest@rabbitmq:5672/bovespa'],
-      queue: 'corretora',
-      queueOptions: {
-        durable: true,
-      },
-    },
-  });
-  app.listen(() => logger.log('Listening'));
+  const app = await NestFactory.create(AppModule);
+  app.listen(3333, () => logger.log('Listening'));
 }
 bootstrap();
