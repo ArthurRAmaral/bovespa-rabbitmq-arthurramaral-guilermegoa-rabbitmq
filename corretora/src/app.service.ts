@@ -26,7 +26,7 @@ export class AppService {
   }
 
   compra(compraDto: CompraDto) {
-    this.logger.log('venda', compraDto.corretora);
+    this.logger.log('compra', compraDto.corretora);
     return this.bolsaDeValoresProxy.send('compra', compraDto);
   }
 
