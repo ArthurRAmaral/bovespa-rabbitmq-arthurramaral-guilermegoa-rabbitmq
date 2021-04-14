@@ -10,7 +10,7 @@ import { Injectable } from '@nestjs/common';
 export class LivroOfertasService {
   Map_de_compra = new Map<string, CompraDto[]>();
   Map_de_venda = new Map<string, VendaDto[]>();
-  Map_de_transacoes: TransacaoDto[] = [];
+  Lista_de_transacoes: TransacaoDto[] = [];
 
   verificaCompra(compra: CompraDto, ativo: string): TransacaoDto[] {
     const lista_ativo = this.Map_de_venda.get(ativo);
@@ -18,7 +18,7 @@ export class LivroOfertasService {
 
     if (!lista_ativo.length) {
       this.Map_de_compra.set(ativo, [compra]);
-      return;
+      return [];
     }
 
     lista_ativo.forEach((venda) => {
@@ -110,7 +110,7 @@ export class LivroOfertasService {
     venda: VendaDto,
     transacoes: TransacaoDto[],
   ) {
-    this.salvaTransacao(this.Map_de_transacoes, compra, venda);
+    this.salvaTransacao(this.Lista_de_transacoes, compra, venda);
     this.salvaTransacao(transacoes, compra, venda);
     switch (caso) {
       case 'compra_menor_venda':
