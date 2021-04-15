@@ -6,8 +6,9 @@ services:
     build: ./corretora
     ports:
       - 3001:${PORT:-3333}
-    environment: 
+    environment:
       - NOME_CORRETORA=${NOME_CORRETORA:-COR1}
+      - RMQ_HOST=${RMQ_HOST:-rabbitmq}
       - RMQ_PORT=${RMQ_PORT:-5672}
     volumes:
       - ./corretora:/home/node/app
@@ -19,8 +20,9 @@ services:
     build: ./corretora
     ports:
       - 3002:${PORT:-3333}
-    environment: 
+    environment:
       - NOME_CORRETORA=${NOME_CORRETORA:-COR2}
+      - RMQ_HOST=${RMQ_HOST:-rabbitmq}
       - RMQ_PORT=${RMQ_PORT:-5672}
     volumes:
       - ./corretora:/home/node/app
@@ -30,6 +32,9 @@ services:
   bolsa-de-valores:
     image: bolsa-de-valores
     build: ./bolsa-de-valores
+    environment:
+      - RMQ_HOST=${RMQ_HOST:-rabbitmq}
+      - RMQ_PORT=${RMQ_PORT:-5672}
     volumes:
       - ./bolsa-de-valores:/home/node/app
     depends_on:
