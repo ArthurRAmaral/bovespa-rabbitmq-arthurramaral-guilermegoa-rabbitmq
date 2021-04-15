@@ -12,89 +12,80 @@ export class LivroOfertasService {
   Map_de_venda = new Map<string, VendaDto[]>();
   Lista_de_transacoes: TransacaoDto[] = [];
 
-  verificaCompra(compra: CompraDto, ativo: string): TransacaoDto[] {
-    const lista_ativo_venda = this.Map_de_venda.get(ativo);
+  addCompra(compra: CompraDto, ativo: string): void {
+    const listaAtivo = this.Map_de_compra.get(ativo);
 
-    if (!lista_ativo_venda) {
-      const lista_ativo_compra = this.Map_de_compra.get(ativo);
-      lista_ativo_compra
-        ? lista_ativo_compra.push(compra)
-        : this.Map_de_compra.set(ativo, [compra]);
-      return [];
+    if (!listaAtivo) {
+      this.Map_de_compra.set(ativo, [compra]);
+      return;
     }
 
-    const transacoes: TransacaoDto[] = [];
+    this.Map_de_compra.delete(ativo);
+    this.Map_de_compra.set(ativo, [...listaAtivo, compra]);
 
-    lista_ativo_venda.forEach((venda) => {
-      if (
-        !this.ocorreTransacao(compra.valor, venda.valor) &&
-        compra.quantidade
-      ) {
-        return;
-      }
-
-      const caso: string = this.acha_caso(compra.quantidade, venda.quantidade);
-
-      this.efetuaCaso(caso, compra, venda, transacoes);
-    });
-
-    this.limpaListaQuantidadeZerada(this.Map_de_venda, ativo);
-
-    if (compra.quantidade) {
-      this.atualizaLista(this.Map_de_compra, ativo, compra);
-    }
-
-    return transacoes;
+    return;
   }
 
-  verificaVenda(venda: VendaDto, ativo: string): TransacaoDto[] {
+  addVenda(venda: VendaDto, ativo: string): void {
+    const listaAtivo = this.Map_de_venda.get(ativo);
+
+    if (!listaAtivo) {
+      this.Map_de_venda.set(ativo, [venda]);
+      return;
+    }
+
+    this.Map_de_venda.delete(ativo);
+    this.Map_de_venda.set(ativo, [...listaAtivo, venda]);
+
+    return;
+  }
+
+  verifica(ativo: string): TransacaoDto[] {
+    const lista_ativo_venda = this.Map_de_venda.get(ativo);
     const lista_ativo_compra = this.Map_de_compra.get(ativo);
 
-    if (!lista_ativo_compra) {
-      const lista_ativo_venda = this.Map_de_venda.get(ativo);
-      lista_ativo_venda
-        ? lista_ativo_venda.push(venda)
-        : this.Map_de_venda.set(ativo, [venda]);
-      return [];
-    }
-
     const transacoes: TransacaoDto[] = [];
 
-    lista_ativo_compra.forEach((compra) => {
-      if (
-        !this.ocorreTransacao(compra.valor, compra.valor) &&
-        compra.quantidade
-      ) {
-        return;
+    if (!lista_ativo_venda || !lista_ativo_compra) {
+      return transacoes;
+    }
+
+    lista_ativo_venda.forEach((venda) => {
+      const possicaoCompra = lista_ativo_compra.findIndex(
+        (compra) => compra.valor === venda.valor,
+      );
+
+      const compra = lista_ativo_compra[possicaoCompra];
+
+      const fazVenda = compra.valor === venda.valor;
+
+      if (possicaoCompra && fazVenda) {
+        const caso = this.achaCaso(venda.quantidade, compra.quantidade);
+
+        this.salvaTransacao(this.Lista_de_transacoes, compra, venda);
+        this.salvaTransacao(transacoes, compra, venda);
+
+        switch (caso) {
+          case 'compra_menor_venda':
+            venda.quantidade -= compra.quantidade;
+            compra.quantidade = 0;
+            break;
+          case 'compra_igual_venda':
+            compra.quantidade = 0;
+            venda.quantidade = 0;
+            break;
+          case 'compra_maior_venda':
+            compra.quantidade -= venda.quantidade;
+            venda.quantidade = 0;
+            break;
+        }
       }
-
-      const caso: string = this.acha_caso(compra.quantidade, venda.quantidade);
-
-      this.efetuaCaso(caso, compra, venda, transacoes);
     });
 
     this.limpaListaQuantidadeZerada(this.Map_de_venda, ativo);
-
-    if (venda.quantidade) {
-      this.atualizaLista(this.Map_de_compra, ativo, venda);
-    }
+    this.limpaListaQuantidadeZerada(this.Map_de_compra, ativo);
 
     return transacoes;
-  }
-
-  private atualizaLista(
-    map: Map<string, CompraDto[] | VendaDto[]>,
-    ativo: string,
-    item_add: CompraDto | VendaDto,
-  ) {
-    const lista = map.get(ativo);
-
-    if (lista) {
-      this.Map_de_compra.delete(ativo);
-      this.Map_de_compra.set(ativo, [...lista, item_add]);
-    } else {
-      this.Map_de_compra.set(ativo, [item_add]);
-    }
   }
 
   private limpaListaQuantidadeZerada(
@@ -113,31 +104,7 @@ export class LivroOfertasService {
     map.set(ativo, nova_lista);
   }
 
-  private efetuaCaso(
-    caso: string,
-    compra: CompraDto,
-    venda: VendaDto,
-    transacoes: TransacaoDto[],
-  ) {
-    this.salvaTransacao(this.Lista_de_transacoes, compra, venda);
-    this.salvaTransacao(transacoes, compra, venda);
-    switch (caso) {
-      case 'compra_menor_venda':
-        venda.quantidade -= compra.quantidade;
-        compra.quantidade = 0;
-        break;
-      case 'compra_igual_venda':
-        compra.quantidade = 0;
-        venda.quantidade = 0;
-        break;
-      case 'compra_maior_venda':
-        compra.quantidade -= venda.quantidade;
-        venda.quantidade = 0;
-        break;
-    }
-  }
-
-  private acha_caso(compra_quantidade: number, venda_quantidade: number) {
+  private achaCaso(compra_quantidade: number, venda_quantidade: number) {
     const relacao_compra_venda = compra_quantidade - venda_quantidade;
 
     if (relacao_compra_venda < 0) {
@@ -146,10 +113,6 @@ export class LivroOfertasService {
       return 'compra_igual_venda';
     }
     return 'compra_maior_venda';
-  }
-
-  private ocorreTransacao(preco_compra: number, preco_venda) {
-    return preco_compra <= preco_venda;
   }
 
   private salvaTransacao(
