@@ -6,7 +6,6 @@ import { BolsaCompraDto } from './dto/bolsa-compra.dto';
 import { BolsaVendaDto } from './dto/bolsa-venda.dto';
 import { ConfigService } from '@nestjs/config';
 
-
 @Injectable()
 export class AppService {
   private logger: Logger;
@@ -16,19 +15,27 @@ export class AppService {
   private readonly compraExchange: string;
   private readonly compraPrefix: string;
 
-  constructor(private readonly amqpConnection: AmqpConnection, private configService: ConfigService) {
-    this.corretora = this.configService.get<string>('corretora')
-    this.compraExchange = this.configService.get<string>('rabbitmq.exchanges.compra')
-    this.compraPrefix = 'compra'
-    this.vendaExchange = this.configService.get<string>('rabbitmq.exchanges.venda')
-    this.vendaPrefix = 'venda'
-    this.logger = new Logger(this.corretora)
+  constructor(
+    private readonly amqpConnection: AmqpConnection,
+    private configService: ConfigService,
+  ) {
+    this.corretora = this.configService.get<string>('corretora');
+    this.compraExchange = this.configService.get<string>(
+      'rabbitmq.exchanges.compra',
+    );
+    this.compraPrefix = 'compra';
+    this.vendaExchange = this.configService.get<string>(
+      'rabbitmq.exchanges.venda',
+    );
+    this.vendaPrefix = 'venda';
+    this.logger = new Logger(this.corretora);
   }
 
   async compra({ quantidade, valor, ativo }: ClientCompraDto) {
     const compraRequest: BolsaCompraDto = {
       corretora: this.corretora,
-      quantidade, valor
+      quantidade,
+      valor,
     };
 
     this.logger.log(ativo, this.compraPrefix);
@@ -45,7 +52,8 @@ export class AppService {
   async venda({ quantidade, valor, ativo }: ClientVendaDto) {
     const vendaRequest: BolsaVendaDto = {
       corretora: this.corretora,
-      quantidade, valor
+      quantidade,
+      valor,
     };
 
     this.logger.log(ativo, this.vendaPrefix);
@@ -53,7 +61,7 @@ export class AppService {
     const response = await this.amqpConnection.request({
       exchange: this.vendaExchange,
       routingKey: `${this.vendaPrefix}.${ativo}`,
-      payload: vendaRequest
+      payload: vendaRequest,
     });
 
     return response;

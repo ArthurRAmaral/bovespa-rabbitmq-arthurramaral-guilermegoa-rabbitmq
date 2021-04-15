@@ -17,11 +17,13 @@ export class LivroOfertasService {
 
     if (!lista_ativo_venda) {
       const lista_ativo_compra = this.Map_de_compra.get(ativo);
-      lista_ativo_compra ? lista_ativo_compra.push(compra) : this.Map_de_compra.set(ativo, [compra]);
+      lista_ativo_compra
+        ? lista_ativo_compra.push(compra)
+        : this.Map_de_compra.set(ativo, [compra]);
       return [];
     }
 
-    let transacoes: TransacaoDto[] = [];
+    const transacoes: TransacaoDto[] = [];
 
     lista_ativo_venda.forEach((venda) => {
       if (
@@ -50,11 +52,13 @@ export class LivroOfertasService {
 
     if (!lista_ativo_compra) {
       const lista_ativo_venda = this.Map_de_venda.get(ativo);
-      lista_ativo_venda ? lista_ativo_venda.push(venda) : this.Map_de_venda.set(ativo, [venda]);
+      lista_ativo_venda
+        ? lista_ativo_venda.push(venda)
+        : this.Map_de_venda.set(ativo, [venda]);
       return [];
     }
 
-    let transacoes: TransacaoDto[] = [];
+    const transacoes: TransacaoDto[] = [];
 
     lista_ativo_compra.forEach((compra) => {
       if (

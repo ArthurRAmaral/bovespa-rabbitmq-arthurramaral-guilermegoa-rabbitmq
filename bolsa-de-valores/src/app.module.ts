@@ -14,4 +14,4 @@ import { ConfigurationModule } from './configuration/configuration.module';
   controllers: [],
   providers: [AppService, LivroOfertasService],
 })
-export class AppModule { }
+export class AppModule {}

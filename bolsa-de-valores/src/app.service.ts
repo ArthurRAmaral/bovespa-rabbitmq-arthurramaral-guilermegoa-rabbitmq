@@ -20,17 +20,17 @@ export class AppService {
   private readonly indexOfAtivo = 1;
   private readonly logger = new Logger(AppService.name);
 
-  constructor(private livroDeOfertas: LivroOfertasService) { }
+  constructor(private livroDeOfertas: LivroOfertasService) {}
 
   @RabbitRPC({
     exchange: compraExchange,
     routingKey: `${compraPrefix}.*`,
   })
   compra(compraDto: CompraDto, amqpMsg) {
-    const ativo = this.getAtivoFromRoutingKey(amqpMsg.fields.routingKey)
-    this.logger.log(ativo, compraPrefix)
+    const ativo = this.getAtivoFromRoutingKey(amqpMsg.fields.routingKey);
+    this.logger.log(ativo, compraPrefix);
     this.livroDeOfertas.verificaCompra(compraDto, ativo);
-    return `${ativo} := <quant: ${compraDto.quantidade}, val: ${compraDto.valor}, corretora: ${compraDto.corretora}>`
+    return `${ativo} := <quant: ${compraDto.quantidade}, val: ${compraDto.valor}, corretora: ${compraDto.corretora}>`;
   }
 
   @RabbitRPC({
@@ -38,10 +38,10 @@ export class AppService {
     routingKey: `${vendaPrefix}.*`,
   })
   venda(vendaDto: VendaDto, amqpMsg) {
-    const ativo = this.getAtivoFromRoutingKey(amqpMsg.fields.routingKey)
-    this.logger.log(ativo, vendaPrefix)
+    const ativo = this.getAtivoFromRoutingKey(amqpMsg.fields.routingKey);
+    this.logger.log(ativo, vendaPrefix);
     this.livroDeOfertas.verificaVenda(vendaDto, ativo);
-    return `${ativo} := <quant: ${vendaDto.quantidade}, val: ${vendaDto.valor}, corretora: ${vendaDto.corretora}>`
+    return `${ativo} := <quant: ${vendaDto.quantidade}, val: ${vendaDto.valor}, corretora: ${vendaDto.corretora}>`;
   }
 
   private getAtivoFromRoutingKey(routingKey: string): string {
