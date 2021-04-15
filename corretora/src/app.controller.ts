@@ -1,5 +1,5 @@
-import { VendaDto } from './dto/venda.dto';
-import { CompraDto } from './dto/compra.dto';
+import { ClientVendaDto } from './dto/client-venda.dto';
+import { ClientCompraDto } from './dto/client-compra.dto';
 import { Body, Controller, Post } from '@nestjs/common';
 import { AppService } from './app.service';
 
@@ -8,12 +8,12 @@ export class AppController {
   constructor(private readonly appService: AppService) { }
 
   @Post('compra')
-  compra(@Body() compraDto: CompraDto) {
-    return this.appService.compra(compraDto);
+  compra(@Body() clientCompraDto: ClientCompraDto) {
+    return this.appService.compra(clientCompraDto);
   }
 
   @Post('venda')
-  venda(@Body() vendaDto: VendaDto) {
-    return this.appService.venda(vendaDto);
+  venda(@Body() clientVendaDto: ClientVendaDto) {
+    return this.appService.venda(clientVendaDto);
   }
 }

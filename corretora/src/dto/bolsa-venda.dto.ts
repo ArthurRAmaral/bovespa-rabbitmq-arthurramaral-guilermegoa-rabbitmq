@@ -1,4 +1,4 @@
-export interface VendaDto {
+export interface BolsaVendaDto {
   quantidade: number;
   valor: number;
   corretora: string;

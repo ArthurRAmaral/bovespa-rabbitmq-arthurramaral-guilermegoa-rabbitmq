@@ -1,6 +1,5 @@
-export interface CompraDto {
+export interface ClientCompraDto {
   quantidade: number;
   valor: number;
-  corretora: string;
   ativo: string;
 }

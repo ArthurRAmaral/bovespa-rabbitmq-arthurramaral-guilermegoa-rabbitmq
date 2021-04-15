@@ -1,39 +1,61 @@
-import { CompraDto } from './dto/compra.dto';
-import { VendaDto } from './dto/venda.dto';
 import { Injectable, Logger } from '@nestjs/common';
-import {
-  ClientProxy,
-  ClientProxyFactory,
-  Transport,
-} from '@nestjs/microservices';
+import { ClientVendaDto } from './dto/client-venda.dto';
+import { ClientCompraDto } from './dto/client-compra.dto';
+import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
+import { BolsaCompraDto } from './dto/bolsa-compra.dto';
+import { BolsaVendaDto } from './dto/bolsa-venda.dto';
+import { ConfigService } from '@nestjs/config';
+
 
 @Injectable()
 export class AppService {
-  bolsaDeValoresProxy: ClientProxy;
-  logger = new Logger(AppService.name);
+  private logger: Logger;
+  private readonly corretora: string;
+  private readonly vendaExchange: string;
+  private readonly vendaPrefix: string;
+  private readonly compraExchange: string;
+  private readonly compraPrefix: string;
 
-  constructor() {
-    this.bolsaDeValoresProxy = ClientProxyFactory.create({
-      transport: Transport.RMQ,
-      options: {
-        urls: ['amqp://guest:guest@rabbitmq:5672/bovespa'],
-        queue: 'bolsa-de-valores',
-        queueOptions: {
-          durable: true,
-        },
-      },
+  constructor(private readonly amqpConnection: AmqpConnection, private configService: ConfigService) {
+    this.corretora = this.configService.get<string>('corretora')
+    this.compraExchange = this.configService.get<string>('rabbitmq.exchanges.compra')
+    this.compraPrefix = 'compra'
+    this.vendaExchange = this.configService.get<string>('rabbitmq.exchanges.venda')
+    this.vendaPrefix = 'venda'
+    this.logger = new Logger(this.corretora)
+  }
+
+  async compra({ quantidade, valor, ativo }: ClientCompraDto) {
+    const compraRequest: BolsaCompraDto = {
+      corretora: this.corretora,
+      quantidade, valor
+    };
+
+    this.logger.log(ativo, this.compraPrefix);
+
+    const response = await this.amqpConnection.request({
+      exchange: this.compraExchange,
+      routingKey: `${this.compraPrefix}.${ativo}`,
+      payload: compraRequest,
     });
+
+    return response;
   }
 
-  compra(compraDto: CompraDto) {
-    compraDto.corretora = "CORRETORA"
-    this.logger.log('compra', compraDto.corretora);
-    return this.bolsaDeValoresProxy.send('compra', compraDto);
-  }
+  async venda({ quantidade, valor, ativo }: ClientVendaDto) {
+    const vendaRequest: BolsaVendaDto = {
+      corretora: this.corretora,
+      quantidade, valor
+    };
 
-  venda(vendaDto: VendaDto) {
-    vendaDto.corretora = "CORRETORA"
-    this.logger.log('venda', vendaDto.corretora);
-    return this.bolsaDeValoresProxy.send('venda', vendaDto);
+    this.logger.log(ativo, this.vendaPrefix);
+
+    const response = await this.amqpConnection.request({
+      exchange: this.vendaExchange,
+      routingKey: `${this.vendaPrefix}.${ativo}`,
+      payload: vendaRequest
+    });
+
+    return response;
   }
 }

@@ -1,11 +1,27 @@
 version: '3.2'
 
 services:
-  corretora:
+  corretora1:
     image: corretora
     build: ./corretora
     ports:
-      - 3333:3333
+      - 3001:${PORT:-3333}
+    environment: 
+      - NOME_CORRETORA=${NOME_CORRETORA:-COR1}
+      - RMQ_PORT=${RMQ_PORT:-5672}
+    volumes:
+      - ./corretora:/home/node/app
+    depends_on:
+      - rabbitmq
+
+  corretora2:
+    image: corretora
+    build: ./corretora
+    ports:
+      - 3002:${PORT:-3333}
+    environment: 
+      - NOME_CORRETORA=${NOME_CORRETORA:-COR2}
+      - RMQ_PORT=${RMQ_PORT:-5672}
     volumes:
       - ./corretora:/home/node/app
     depends_on:
@@ -25,10 +41,10 @@ services:
       driver: none
     container_name: 'rabbitmq'
     ports:
-      - 5672:5672
+      - ${RMQ_PORT:-5672}:${RMQ_PORT:-5672}
       - 15672:15672
     volumes:
-      - rabbitmq-data:/var/lib/rabbitmq/
+      - rabbitmq-data:/var/lib/rabbitmq
       - rabbitmq-log:/var/log/rabbitmq
 
 volumes:
