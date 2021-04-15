@@ -29,7 +29,10 @@ export class AppService {
   compra(compraDto: CompraDto, amqpMsg) {
     const ativo = this.getAtivoFromRoutingKey(amqpMsg.fields.routingKey);
     this.logger.log(ativo, compraPrefix);
-    this.livroDeOfertas.verificaCompra(compraDto, ativo);
+
+    this.livroDeOfertas.addCompra(compraDto, ativo);
+    this.livroDeOfertas.verifica(ativo);
+
     return `${ativo} := <quant: ${compraDto.quantidade}, val: ${compraDto.valor}, corretora: ${compraDto.corretora}>`;
   }
 
@@ -40,7 +43,10 @@ export class AppService {
   venda(vendaDto: VendaDto, amqpMsg) {
     const ativo = this.getAtivoFromRoutingKey(amqpMsg.fields.routingKey);
     this.logger.log(ativo, vendaPrefix);
-    this.livroDeOfertas.verificaVenda(vendaDto, ativo);
+
+    this.livroDeOfertas.addVenda(vendaDto, ativo);
+    this.livroDeOfertas.verifica(ativo);
+
     return `${ativo} := <quant: ${vendaDto.quantidade}, val: ${vendaDto.valor}, corretora: ${vendaDto.corretora}>`;
   }
 
