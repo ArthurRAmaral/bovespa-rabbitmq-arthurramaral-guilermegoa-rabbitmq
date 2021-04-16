@@ -4,8 +4,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 export const rabbitMQConfig = {
   imports: [ConfigModule],
   useFactory: async (configService: ConfigService): Promise<RabbitMQConfig> => {
-    const compraExchange = configService.get<string>('rabbitmq.exchanges.compra');
+    const compraExchange = configService.get<string>(
+      'rabbitmq.exchanges.compra',
+    );
     const vendaExchange = configService.get<string>('rabbitmq.exchanges.venda');
+    const transacoesExchange = configService.get<string>(
+      'rabbitmq.exchanges.transacoes',
+    );
     const user = configService.get<string>('rabbitmq.user');
     const password = configService.get<string>('rabbitmq.password');
     const url = configService.get<string>('rabbitmq.url');
@@ -15,15 +20,19 @@ export const rabbitMQConfig = {
       exchanges: [
         {
           name: compraExchange,
-          type: 'topic'
+          type: 'topic',
         },
         {
           name: vendaExchange,
-          type: 'topic'
+          type: 'topic',
+        },
+        {
+          name: transacoesExchange,
+          type: 'fanout',
         },
       ],
       uri: `amqp://${user}:${password}@${url}:${port}`,
-    }
+    };
   },
   inject: [ConfigService],
 };

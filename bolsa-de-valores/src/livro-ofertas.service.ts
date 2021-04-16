@@ -2,15 +2,24 @@ import { CompraDto } from './dto/compra.dto';
 import { VendaDto } from './dto/venda.dto';
 import { TransacaoDto } from './dto/transacao.dto';
 import { Injectable } from '@nestjs/common';
+import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
+import configuration from './configuration/configuration';
 
 // TO DO -> Vamos vericar se o mesmo usario esta fazendo um update
 // TO DO -> So fazer compra ou venda quando uma das duas fecharem
+
+const config = configuration();
+
+const transacoesExchange = config.rabbitmq.exchanges.transacoes;
+const routingKey = config.rabbitmq.routingKey.transacoes;
 
 @Injectable()
 export class LivroOfertasService {
   Map_de_compra = new Map<string, CompraDto[]>();
   Map_de_venda = new Map<string, VendaDto[]>();
   Lista_de_transacoes: TransacaoDto[] = [];
+
+  constructor(private readonly amqpConnection: AmqpConnection) {}
 
   addCompra(compra: CompraDto, ativo: string): void {
     const listaAtivo = this.Map_de_compra.get(ativo);
@@ -41,6 +50,12 @@ export class LivroOfertasService {
   }
 
   verifica(ativo: string): TransacaoDto[] {
+    this.amqpConnection.publish(
+      transacoesExchange,
+      routingKey,
+      `Nome do ativo: ${ativo}`,
+    );
+
     const lista_ativo_venda = this.Map_de_venda.get(ativo);
     const lista_ativo_compra = this.Map_de_compra.get(ativo);
 

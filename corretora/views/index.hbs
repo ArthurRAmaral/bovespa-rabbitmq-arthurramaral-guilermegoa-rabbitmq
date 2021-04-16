@@ -4,6 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <title>{{corretora}}</title>
+  <script src="/socket.io/socket.io.js"></script>
 </head>
 
 <body>
@@ -40,6 +41,10 @@
       <br>
       <input type="submit" value="Enviar">
     </form>
+  </div>
+  <div>
+    <span>Novas transações:</span>
+    <ul id="transacoes"></ul>
   </div>
   <script>
     const form = document.getElementById('form');
@@ -88,6 +93,21 @@
       }
     })
 
+
+    const listaDeTransacoes = document.querySelector('#transacoes');
+
+    const socket = new io(`http://${window.location.host}`);
+
+    socket.addEventListener('open', () => {
+      console.info('Socket connected');
+    });
+
+    socket.addEventListener('transactions', (event) => {
+      const listItem = document.createElement('li');
+
+      listItem.textContent = event.data;
+      listaDeTransacoes.appendChild(listItem);
+    });
   </script>
 </body>
 

@@ -1,8 +1,9 @@
 import { ClientVendaDto } from './dto/client-venda.dto';
 import { ClientCompraDto } from './dto/client-compra.dto';
-import { Body, Controller, Get, Post, Render } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Render } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ConfigService } from '@nestjs/config';
+import { SocketGateway } from './socket.gateway';
 
 @Controller()
 export class AppController {

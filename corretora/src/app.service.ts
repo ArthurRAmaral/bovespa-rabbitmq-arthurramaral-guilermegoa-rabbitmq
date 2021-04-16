@@ -4,45 +4,43 @@ import { ClientCompraDto } from './dto/client-compra.dto';
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 import { BolsaCompraDto } from './dto/bolsa-compra.dto';
 import { BolsaVendaDto } from './dto/bolsa-venda.dto';
-import { ConfigService } from '@nestjs/config';
+import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
+import { SocketGateway } from './socket.gateway';
+import configuration from './configuration/configuration';
+
+const config = configuration();
+
+const transacoesExchange = config.rabbitmq.exchanges.transacoes;
+const transacoesRountingKey = config.rabbitmq.routingKey.transacoes;
+const corretora = config.corretora;
+const vendaExchange = config.rabbitmq.exchanges.venda;
+const vendaPrefix = config.rabbitmq.prefix.venda;
+const compraExchange = config.rabbitmq.exchanges.compra;
+const compraPrefix = config.rabbitmq.prefix.compra;
 
 @Injectable()
 export class AppService {
   private logger: Logger;
-  private readonly corretora: string;
-  private readonly vendaExchange: string;
-  private readonly vendaPrefix: string;
-  private readonly compraExchange: string;
-  private readonly compraPrefix: string;
 
   constructor(
     private readonly amqpConnection: AmqpConnection,
-    private configService: ConfigService,
+    private readonly socket: SocketGateway,
   ) {
-    this.corretora = this.configService.get<string>('corretora');
-    this.compraExchange = this.configService.get<string>(
-      'rabbitmq.exchanges.compra',
-    );
-    this.compraPrefix = 'compra';
-    this.vendaExchange = this.configService.get<string>(
-      'rabbitmq.exchanges.venda',
-    );
-    this.vendaPrefix = 'venda';
-    this.logger = new Logger(this.corretora);
+    this.logger = new Logger(corretora);
   }
 
   async compra({ quantidade, valor, ativo }: ClientCompraDto) {
     const compraRequest: BolsaCompraDto = {
-      corretora: this.corretora,
+      corretora,
       quantidade,
       valor,
     };
 
-    this.logger.log(ativo, this.compraPrefix);
+    this.logger.log(ativo, compraPrefix);
 
     const response = await this.amqpConnection.request({
-      exchange: this.compraExchange,
-      routingKey: `${this.compraPrefix}.${ativo}`,
+      exchange: compraExchange,
+      routingKey: `${compraPrefix}.${ativo}`,
       payload: compraRequest,
     });
 
@@ -51,19 +49,28 @@ export class AppService {
 
   async venda({ quantidade, valor, ativo }: ClientVendaDto) {
     const vendaRequest: BolsaVendaDto = {
-      corretora: this.corretora,
+      corretora: corretora,
       quantidade,
       valor,
     };
 
-    this.logger.log(ativo, this.vendaPrefix);
+    this.logger.log(ativo, vendaPrefix);
 
     const response = await this.amqpConnection.request({
-      exchange: this.vendaExchange,
-      routingKey: `${this.vendaPrefix}.${ativo}`,
+      exchange: vendaExchange,
+      routingKey: `${vendaPrefix}.${ativo}`,
       payload: vendaRequest,
     });
 
     return response;
+  }
+
+  @RabbitSubscribe({
+    exchange: transacoesExchange,
+    routingKey: transacoesRountingKey,
+  })
+  teste(msg: any) {
+    this.logger.log(msg, 'Novo Socket');
+    this.socket.onTransaction(msg);
   }
 }

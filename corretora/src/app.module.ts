@@ -5,6 +5,7 @@ import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
 import { rabbitMQConfig } from './configuration/config/rabbitmq.config';
 import { ConfigurationModule } from './configuration/configuration.module';
 import { ConfigModule } from '@nestjs/config';
+import { SocketGateway } from './socket.gateway';
 
 @Module({
   imports: [
@@ -14,6 +15,6 @@ import { ConfigModule } from '@nestjs/config';
     AppModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, SocketGateway],
 })
 export class AppModule {}

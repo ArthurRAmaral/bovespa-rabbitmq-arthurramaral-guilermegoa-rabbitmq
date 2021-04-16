@@ -4,9 +4,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { RabbitRPC } from '@golevelup/nestjs-rabbitmq';
 import { LivroOfertasService } from './livro-ofertas.service';
 import configuration from './configuration/configuration';
-import * as dotenv from 'dotenv';
-
-dotenv.config();
 
 const config = configuration();
 
