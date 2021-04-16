@@ -60,28 +60,12 @@
     form.addEventListener('submit', (event) => {
       event.preventDefault();
 
-      switch (inputs['tipo'].value) {
+      const operacao = inputs['tipo'].value;
 
+      switch (operacao) {
         case 'compra':
-          fetch('./api/compra', {
-            method: 'POST',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            body: createBody()
-          }).then((res) => {
-            return res.text();
-          }).then((data) => {
-            if (data)
-              alert('Pedido de compra registrado')
-            else
-              alert('Erro ao registrar o pedido de compra')
-            console.log(data);
-          })
-          break;
         case 'venda':
-          fetch('./api/venda', {
+          fetch(`./api/${operacao}`, {
             method: 'POST',
             headers: {
               'Accept': 'application/json',
@@ -92,9 +76,9 @@
             return res.text();
           }).then((data) => {
             if (data)
-              alert('Pedido de venda registrado')
+              alert(`Pedido de ${operacao} registrado`)
             else
-              alert('Erro ao registrar o pedido de venda')
+              alert(`Erro ao registrar o pedido de ${operacao}`)
             console.log(data);
           })
           break;
