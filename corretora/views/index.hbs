@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <title>{{corretora}}</title>
+</head>
+
+<body>
+  <h1>
+    {{ corretora }}
+  </h1>
+
+  <div>
+
+    <form id="form">
+      <span>
+        Quantidade de ativos:
+      </span>
+      <input type="number" min="1" name="quantidade">
+      <br>
+      <span>
+        Valor por ativo:
+      </span>
+      <input type="number" name="valor" min="1" step="0.01" />
+      <br>
+      <span>
+        Nome do ativo:
+      </span>
+      <input type="text" name="ativo" />
+      <br>
+      <span>
+        Método:
+      </span>
+      <select name="tipo">
+        <option value="">-</option>
+        <option value="compra">compra</option>
+        <option value="venda">venda</option>
+      </select>
+      <br>
+      <input type="submit" value="Enviar">
+    </form>
+  </div>
+  <script>
+    const form = document.getElementById('form');
+    const inputs = form.elements;
+
+    function inputInvalido() {
+      alert('Preencha todos os campos');
+    }
+
+    function createBody() {
+      return JSON.stringify({
+        quantidade: inputs['quantidade'].value,
+        valor: inputs['valor'].value,
+        ativo: inputs['ativo'].value,
+      });
+    }
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      switch (inputs['tipo'].value) {
+
+        case 'compra':
+          fetch('./api/compra', {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: createBody()
+          }).then((res) => {
+            return res.text();
+          }).then((data) => {
+            if (data)
+              alert('Pedido de compra registrado')
+            else
+              alert('Erro ao registrar o pedido de compra')
+            console.log(data);
+          })
+          break;
+        case 'venda':
+          fetch('./api/venda', {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: createBody()
+          }).then((res) => {
+            return res.text();
+          }).then((data) => {
+            if (data)
+              alert('Pedido de venda registrado')
+            else
+              alert('Erro ao registrar o pedido de venda')
+            console.log(data);
+          })
+          break;
+        default:
+          inputInvalido()
+          break;
+      }
+    })
+
+  </script>
+</body>
+
+</html>

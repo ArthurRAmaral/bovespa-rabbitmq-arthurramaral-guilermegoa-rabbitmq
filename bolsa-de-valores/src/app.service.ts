@@ -25,6 +25,7 @@ export class AppService {
   @RabbitRPC({
     exchange: compraExchange,
     routingKey: `${compraPrefix}.*`,
+    queue: compraExchange,
   })
   compra(compraDto: CompraDto, amqpMsg) {
     const ativo = this.getAtivoFromRoutingKey(amqpMsg.fields.routingKey);
@@ -39,6 +40,7 @@ export class AppService {
   @RabbitRPC({
     exchange: vendaExchange,
     routingKey: `${vendaPrefix}.*`,
+    queue: vendaExchange,
   })
   venda(vendaDto: VendaDto, amqpMsg) {
     const ativo = this.getAtivoFromRoutingKey(amqpMsg.fields.routingKey);
