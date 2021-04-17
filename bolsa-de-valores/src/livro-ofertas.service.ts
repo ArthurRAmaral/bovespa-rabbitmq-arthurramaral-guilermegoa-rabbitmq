@@ -11,7 +11,7 @@ import configuration from './configuration/configuration';
 const config = configuration();
 
 const transacoesExchange = config.rabbitmq.exchanges.transacoes;
-const routingKey = config.rabbitmq.routingKey.transacoes;
+const transacoesPrefix = config.rabbitmq.prefix.transacoes;
 
 @Injectable()
 export class LivroOfertasService {
@@ -19,7 +19,7 @@ export class LivroOfertasService {
   Map_de_venda = new Map<string, VendaDto[]>();
   Lista_de_transacoes: TransacaoDto[] = [];
 
-  constructor(private readonly amqpConnection: AmqpConnection) {}
+  constructor(private readonly amqpConnection: AmqpConnection) { }
 
   addCompra(compra: CompraDto, ativo: string): void {
     const listaAtivo = this.Map_de_compra.get(ativo);
@@ -50,12 +50,6 @@ export class LivroOfertasService {
   }
 
   verifica(ativo: string): TransacaoDto[] {
-    this.amqpConnection.publish(
-      transacoesExchange,
-      routingKey,
-      `Nome do ativo: ${ativo}`,
-    );
-
     const lista_ativo_venda = this.Map_de_venda.get(ativo);
     const lista_ativo_compra = this.Map_de_compra.get(ativo);
 
@@ -66,39 +60,53 @@ export class LivroOfertasService {
     }
 
     lista_ativo_venda.forEach((venda) => {
-      const possicaoCompra = lista_ativo_compra.findIndex(
-        (compra) => compra.valor === venda.valor,
-      );
+      let fazerMaisCompra = true;
 
-      const compra = lista_ativo_compra[possicaoCompra];
+      while (venda.quantidade > 0 && fazerMaisCompra) {
+        const compra = this.Map_de_compra.get(ativo).find(
+          (compra) => compra.valor >= venda.valor,
+        );
 
-      const fazVenda = compra.valor === venda.valor;
+        fazerMaisCompra = !!compra;
 
-      if (possicaoCompra && fazVenda) {
-        const caso = this.achaCaso(venda.quantidade, compra.quantidade);
 
-        this.salvaTransacao(this.Lista_de_transacoes, compra, venda);
-        this.salvaTransacao(transacoes, compra, venda);
+        if (fazerMaisCompra) {
+          const caso = this.achaCaso(compra, venda);
 
-        switch (caso) {
-          case 'compra_menor_venda':
-            venda.quantidade -= compra.quantidade;
-            compra.quantidade = 0;
-            break;
-          case 'compra_igual_venda':
-            compra.quantidade = 0;
-            venda.quantidade = 0;
-            break;
-          case 'compra_maior_venda':
-            compra.quantidade -= venda.quantidade;
-            venda.quantidade = 0;
-            break;
+          switch (caso) {
+            case 'compra_menor_venda':
+              transacoes.push(this.salvaTransacao(compra, venda, compra.quantidade));
+              venda.quantidade -= compra.quantidade;
+              compra.quantidade = 0;
+              this.limpaListaQuantidadeZerada(this.Map_de_compra, ativo);
+              break;
+            case 'compra_igual_venda':
+              transacoes.push(this.salvaTransacao(compra, venda, compra.quantidade));
+              compra.quantidade = 0;
+              venda.quantidade = 0;
+              this.limpaListaQuantidadeZerada(this.Map_de_venda, ativo);
+              this.limpaListaQuantidadeZerada(this.Map_de_compra, ativo);
+              break;
+            case 'compra_maior_venda':
+              transacoes.push(this.salvaTransacao(compra, venda, venda.quantidade));
+              compra.quantidade -= venda.quantidade;
+              venda.quantidade = 0;
+              this.limpaListaQuantidadeZerada(this.Map_de_venda, ativo);
+              break;
+          }
         }
       }
     });
 
-    this.limpaListaQuantidadeZerada(this.Map_de_venda, ativo);
-    this.limpaListaQuantidadeZerada(this.Map_de_compra, ativo);
+    if (transacoes.length > 0) {
+      transacoes.forEach(transacao =>
+        this.amqpConnection.publish(
+          transacoesExchange,
+          `${transacoesPrefix}.${ativo}`,
+          JSON.stringify(transacao),
+        )
+      )
+    }
 
     return transacoes;
   }
@@ -119,28 +127,30 @@ export class LivroOfertasService {
     map.set(ativo, nova_lista);
   }
 
-  private achaCaso(compra_quantidade: number, venda_quantidade: number) {
-    const relacao_compra_venda = compra_quantidade - venda_quantidade;
+  private achaCaso(compra: CompraDto, venda: VendaDto) {
+    const diferenca_compra_venda = compra.quantidade - venda.quantidade;
 
-    if (relacao_compra_venda < 0) {
+    if (diferenca_compra_venda < 0) {
       return 'compra_menor_venda';
-    } else if (relacao_compra_venda === 0) {
+    } else if (diferenca_compra_venda === 0) {
       return 'compra_igual_venda';
     }
     return 'compra_maior_venda';
   }
 
   private salvaTransacao(
-    lista: TransacaoDto[],
     compra: CompraDto,
     venda: VendaDto,
+    quantidade: number
   ) {
-    lista.push({
+    const transacao = {
       corr_cp: compra.corretora,
       corr_vd: venda.corretora,
       data_hora: new Date(),
-      quant: venda.quantidade,
-      val: compra.valor,
-    });
+      quant: quantidade,
+      val: venda.valor,
+    }
+    this.Lista_de_transacoes.push(transacao);
+    return transacao;
   }
 }

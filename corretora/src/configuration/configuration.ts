@@ -14,8 +14,6 @@ export default () => {
       prefix: {
         compra: process.env.RMQ_PREFIX_COMPRA || 'compra',
         venda: process.env.RMQ_PREFIX_VENDA || 'venda',
-      },
-      routingKey: {
         transacoes:
           process.env.RMQ_ROUTING_KEY_TRANSACOES || 'novas-transacoes',
       },

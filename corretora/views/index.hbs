@@ -93,19 +93,14 @@
       }
     })
 
-
     const listaDeTransacoes = document.querySelector('#transacoes');
 
     const socket = new io(`http://${window.location.host}`);
 
-    socket.addEventListener('open', () => {
-      console.info('Socket connected');
-    });
-
-    socket.addEventListener('transactions', (event) => {
+    socket.addEventListener('transacoes', (event) => {
       const listItem = document.createElement('li');
 
-      listItem.textContent = event.data;
+      listItem.textContent = `${event.ativo} --> ${event.message}`;
       listaDeTransacoes.appendChild(listItem);
     });
   </script>

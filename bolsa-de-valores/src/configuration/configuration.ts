@@ -12,10 +12,7 @@ export default () => {
       prefix: {
         compra: process.env.RMQ_PREFIX_COMPRA || 'compra',
         venda: process.env.RMQ_PREFIX_VENDA || 'venda',
-      },
-      routingKey: {
-        transacoes:
-          process.env.RMQ_ROUTING_KEY_TRANSACOES || 'novas-transacoes',
+        transacoes: process.env.RMQ_ROUTING_KEY_TRANSACOES || 'novas-transacoes',
       },
       user: process.env.RMQ_USER || 'guest',
       password: process.env.RMQ_PASSWORD || 'guest',

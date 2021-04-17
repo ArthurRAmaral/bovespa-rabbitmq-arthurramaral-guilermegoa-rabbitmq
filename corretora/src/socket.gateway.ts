@@ -6,7 +6,7 @@ export class SocketGateway {
   @WebSocketServer()
   server: Server;
 
-  onTransaction(payload) {
-    return this.server.emit('transactions', { data: payload });
+  onTransaction(payload: { ativo: string, message: string }) {
+    return this.server.emit('transacoes', payload);
   }
 }
