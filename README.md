@@ -26,7 +26,7 @@ O trabalho consiste em desenvolver um pequeno aplicativo para o Broker e outro a
 - O servidor deverá ser disponibilizado em uma máquina diferente de localhost.
 - O aplicativo deve funcionar nas máquinas Linux do laboratório de redes do curso de Engenharia de Software da PUC Minas.
 
-<img src='./sequence_bovespa.png'>
+<img src='./imgs/sequence_bovespa.png' style="margin-left: 24px; ">
 
 ---
 
@@ -50,10 +50,13 @@ O rabbitMq é inicado para ser feita a comunição entre a bolsa de valores e a 
 
 #### Corretora 
 
+A corretora tem função de fazer a conexao como cliente e a bolsa de valores. Dessa forma, ela usa do serviço do rabbitMq para fazer a conexão artaves de mesangens, as quais podem ser de venda e compra. Assim, sendo salvas no em cache e quando ocorre a compatibilidade entre uma compra e venda, ocorre uma transação, onde a bolsa recebe que ocorreu essa transaçãoe transmite via web socket para o front.
 
+Esse é o serviço que disponibiliza o html para o teste.
 
-#### Bolsa de vamores
+#### Bolsa de valores
 
+A Bolsa tem a função de processar e salvar o pedido de compra e venda e salvar no livro de ofertas, o qual tem o intuito de verificar se ocorre uma compra.  
 
 ## Diagrama de componentes
 
