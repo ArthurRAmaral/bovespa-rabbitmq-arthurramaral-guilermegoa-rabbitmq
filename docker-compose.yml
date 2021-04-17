@@ -54,10 +54,10 @@ services:
 
 volumes:
   rabbitmq-data:
-    name: rmqdata
+#     name: rmqdata
   rabbitmq-log:
-    name: rmqlog
+#     name: rmqlog
 
-networks:
-  default:
-    name: rabbitmq
+# networks:
+#   default:
+#     name: rabbitmq
