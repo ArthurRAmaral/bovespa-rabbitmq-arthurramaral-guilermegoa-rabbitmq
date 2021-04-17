@@ -19,7 +19,7 @@ export class LivroOfertasService {
   Map_de_venda = new Map<string, VendaDto[]>();
   Lista_de_transacoes: TransacaoDto[] = [];
 
-  constructor(private readonly amqpConnection: AmqpConnection) { }
+  constructor(private readonly amqpConnection: AmqpConnection) {}
 
   addCompra(compra: CompraDto, ativo: string): void {
     const listaAtivo = this.Map_de_compra.get(ativo);
@@ -69,26 +69,31 @@ export class LivroOfertasService {
 
         fazerMaisCompra = !!compra;
 
-
         if (fazerMaisCompra) {
           const caso = this.achaCaso(compra, venda);
 
           switch (caso) {
             case 'compra_menor_venda':
-              transacoes.push(this.salvaTransacao(compra, venda, compra.quantidade));
+              transacoes.push(
+                this.salvaTransacao(compra, venda, compra.quantidade),
+              );
               venda.quantidade -= compra.quantidade;
               compra.quantidade = 0;
               this.limpaListaQuantidadeZerada(this.Map_de_compra, ativo);
               break;
             case 'compra_igual_venda':
-              transacoes.push(this.salvaTransacao(compra, venda, compra.quantidade));
+              transacoes.push(
+                this.salvaTransacao(compra, venda, compra.quantidade),
+              );
               compra.quantidade = 0;
               venda.quantidade = 0;
               this.limpaListaQuantidadeZerada(this.Map_de_venda, ativo);
               this.limpaListaQuantidadeZerada(this.Map_de_compra, ativo);
               break;
             case 'compra_maior_venda':
-              transacoes.push(this.salvaTransacao(compra, venda, venda.quantidade));
+              transacoes.push(
+                this.salvaTransacao(compra, venda, venda.quantidade),
+              );
               compra.quantidade -= venda.quantidade;
               venda.quantidade = 0;
               this.limpaListaQuantidadeZerada(this.Map_de_venda, ativo);
@@ -99,13 +104,13 @@ export class LivroOfertasService {
     });
 
     if (transacoes.length > 0) {
-      transacoes.forEach(transacao =>
+      transacoes.forEach((transacao) =>
         this.amqpConnection.publish(
           transacoesExchange,
           `${transacoesPrefix}.${ativo}`,
-          JSON.stringify(transacao),
-        )
-      )
+          transacao,
+        ),
+      );
     }
 
     return transacoes;
@@ -141,7 +146,7 @@ export class LivroOfertasService {
   private salvaTransacao(
     compra: CompraDto,
     venda: VendaDto,
-    quantidade: number
+    quantidade: number,
   ) {
     const transacao = {
       corr_cp: compra.corretora,
@@ -149,7 +154,7 @@ export class LivroOfertasService {
       data_hora: new Date(),
       quant: quantidade,
       val: venda.valor,
-    }
+    };
     this.Lista_de_transacoes.push(transacao);
     return transacao;
   }

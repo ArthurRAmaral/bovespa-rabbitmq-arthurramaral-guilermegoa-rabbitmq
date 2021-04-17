@@ -5,6 +5,105 @@
   <meta charset="utf-8" />
   <title>{{corretora}}</title>
   <script src="/socket.io/socket.io.js"></script>
+  <style>
+    * {
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    h1 {
+      padding: 20px 30px 0;
+    }
+
+    input,
+    select {
+      margin-bottom: 10px;
+    }
+
+    .flex {
+      display: flex;
+    }
+
+    .flex>div {
+      padding: 30px;
+      width: calc(50vw - 120px);
+    }
+
+    ul {
+      list-style: square;
+    }
+
+    li {
+      padding: 3px;
+    }
+
+    /**
+    * ==============================================
+    * Dot Collision
+    * ==============================================
+    */
+
+    .inline-watching {
+      display: inline-block;
+      margin-left: 10px;
+    }
+
+    /**
+ * ==============================================
+ * Dot Flashing
+ * ==============================================
+ */
+    .dot-flashing {
+      position: relative;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background-color: #505050;
+      color: #505050;
+      animation: dotFlashing 1s infinite linear alternate;
+      animation-delay: .5s;
+    }
+
+    .dot-flashing::before,
+    .dot-flashing::after {
+      content: '';
+      display: inline-block;
+      position: absolute;
+      top: 0;
+    }
+
+    .dot-flashing::before {
+      left: -7px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background-color: #505050;
+      color: #505050;
+      animation: dotFlashing 1s infinite alternate;
+      animation-delay: 0s;
+    }
+
+    .dot-flashing::after {
+      left: 7px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background-color: #505050;
+      color: #505050;
+      animation: dotFlashing 1s infinite alternate;
+      animation-delay: 1s;
+    }
+
+    @keyframes dotFlashing {
+      0% {
+        background-color: #505050;
+      }
+
+      50%,
+      100% {
+        background-color: #ebe6ff;
+      }
+    }
+  </style>
 </head>
 
 <body>
@@ -12,40 +111,49 @@
     {{ corretora }}
   </h1>
 
-  <div>
+  <div class="flex">
+    <div>
 
-    <form id="form">
-      <span>
-        Quantidade de ativos:
-      </span>
-      <input type="number" min="1" name="quantidade">
-      <br>
-      <span>
-        Valor por ativo:
-      </span>
-      <input type="number" name="valor" min="1" step="0.01" />
-      <br>
-      <span>
-        Nome do ativo:
-      </span>
-      <input type="text" name="ativo" />
-      <br>
-      <span>
-        Método:
-      </span>
-      <select name="tipo">
-        <option value="">-</option>
-        <option value="compra">compra</option>
-        <option value="venda">venda</option>
-      </select>
-      <br>
-      <input type="submit" value="Enviar">
-    </form>
+      <form id="form">
+        <span>
+          Quantidade de ativos:
+        </span>
+        <input type="number" min="1" name="quantidade">
+        <br>
+        <span>
+          Valor por ativo:
+        </span>
+        <input type="number" name="valor" min="1" step="0.01" />
+        <br>
+        <span>
+          Nome do ativo:
+        </span>
+        <input type="text" name="ativo" />
+        <br>
+        <span>
+          Método:
+        </span>
+        <select name="tipo">
+          <option value="">-</option>
+          <option value="compra">compra</option>
+          <option value="venda">venda</option>
+        </select>
+        <br>
+        <input type="submit" value="Enviar">
+      </form>
+    </div>
+    <div>
+      <span>Novas transações:</span>
+
+      <ul id="transacoes">
+
+        <li id="loading">
+          <div class="dot-flashing"></div>
+        </li>
+      </ul>
+    </div>
   </div>
-  <div>
-    <span>Novas transações:</span>
-    <ul id="transacoes"></ul>
-  </div>
+
   <script>
     const form = document.getElementById('form');
     const inputs = form.elements;
@@ -99,9 +207,11 @@
 
     socket.addEventListener('transacoes', (event) => {
       const listItem = document.createElement('li');
-
-      listItem.textContent = `${event.ativo} --> ${event.message}`;
+      const loading = document.querySelector('#loading');
+      loading.remove();
+      listItem.textContent = `${event.message.quant} x ${event.ativo} R$ ${event.message.val} : ${event.message.corr_vd} --> ${event.message.corr_cp}`;
       listaDeTransacoes.appendChild(listItem);
+      listaDeTransacoes.appendChild(loading);
     });
   </script>
 </body>
