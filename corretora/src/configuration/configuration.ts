@@ -7,20 +7,19 @@ export default () => {
     corretora: process.env.NOME_CORRETORA || 'DFLT',
     rabbitmq: {
       exchanges: {
-        compra: process.env.RMQ_EXCHANGE_COMPRA || 'compra',
-        venda: process.env.RMQ_EXCHANGE_VENDA || 'venda',
-        transacoes: process.env.RMQ_EXCHANGE_TRANSACOES || 'transacoes',
+        broker: process.env.RMQ_EXCHANGE_BROKER || 'BROKER',
+        bolsaDeValores:
+          process.env.RMQ_EXCHANGE_BOLSADEEVALORES || 'BOLSADEVALORES',
       },
       prefix: {
         compra: process.env.RMQ_PREFIX_COMPRA || 'compra',
         venda: process.env.RMQ_PREFIX_VENDA || 'venda',
-        transacoes:
-          process.env.RMQ_ROUTING_KEY_TRANSACOES || 'novas-transacoes',
+        transacoes: process.env.RMQ_ROUTING_KEY_TRANSACAO || 'transacao',
       },
       user: process.env.RMQ_USER || 'guest',
       password: process.env.RMQ_PASSWORD || 'guest',
-      url: process.env.RMQ_HOST || 'rabbitmq',
-      port: process.env.RMQ_PORT || '5672',
+      url: process.env.RMQ_URL || 'rabbitmq:5672',
+      amqpUrl: process.env.AMQP_URL || null,
     },
   };
 };

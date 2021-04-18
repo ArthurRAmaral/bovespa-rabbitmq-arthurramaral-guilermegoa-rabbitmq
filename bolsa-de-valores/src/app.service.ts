@@ -7,9 +7,8 @@ import configuration from './configuration/configuration';
 
 const config = configuration();
 
-const compraExchange = config.rabbitmq.exchanges.compra;
+const brokerExchange = config.rabbitmq.exchanges.broker;
 const compraPrefix = config.rabbitmq.prefix.compra;
-const vendaExchange = config.rabbitmq.exchanges.venda;
 const vendaPrefix = config.rabbitmq.prefix.venda;
 
 @Injectable()
@@ -20,9 +19,9 @@ export class AppService {
   constructor(private livroDeOfertas: LivroOfertasService) {}
 
   @RabbitRPC({
-    exchange: compraExchange,
+    exchange: brokerExchange,
     routingKey: `${compraPrefix}.*`,
-    queue: compraExchange,
+    queue: brokerExchange,
   })
   compra(compraDto: CompraDto, amqpMsg) {
     const ativo = this.getAtivoFromRoutingKey(amqpMsg.fields.routingKey);
@@ -35,9 +34,9 @@ export class AppService {
   }
 
   @RabbitRPC({
-    exchange: vendaExchange,
+    exchange: brokerExchange,
     routingKey: `${vendaPrefix}.*`,
-    queue: vendaExchange,
+    queue: brokerExchange,
   })
   venda(vendaDto: VendaDto, amqpMsg) {
     const ativo = this.getAtivoFromRoutingKey(amqpMsg.fields.routingKey);

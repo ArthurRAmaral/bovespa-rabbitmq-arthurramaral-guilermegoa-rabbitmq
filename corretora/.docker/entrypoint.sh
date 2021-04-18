@@ -2,12 +2,14 @@
 
 PATH=${PATH}:$HOME/app/node_modules/.bin
 
-RMQ_HOST=${RMQ_HOST:?}
-RMQ_PORT=${RMQ_PORT:?}
+RMQ_URL=${RMQ_URL}
 
-until nc -z ${RMQ_HOST} ${RMQ_PORT}; do
-  sleep 0.1
-done
+if [ -z RMQ_ULR ]
+then
+  until nc -z ${RMQ_URL}; do
+    sleep 0.1
+  done
+fi
 
 yarn install --silent
 

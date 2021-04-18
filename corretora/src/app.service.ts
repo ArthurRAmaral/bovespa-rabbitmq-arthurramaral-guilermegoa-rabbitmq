@@ -10,13 +10,14 @@ import configuration from './configuration/configuration';
 
 const config = configuration();
 
-const transacoesExchange = config.rabbitmq.exchanges.transacoes;
-const transacoesPrefix = config.rabbitmq.prefix.transacoes;
 const corretora = config.corretora;
-const vendaExchange = config.rabbitmq.exchanges.venda;
+
+const brokerExchange = config.rabbitmq.exchanges.broker;
+const bolsaExchange = config.rabbitmq.exchanges.bolsaDeValores;
+
 const vendaPrefix = config.rabbitmq.prefix.venda;
-const compraExchange = config.rabbitmq.exchanges.compra;
 const compraPrefix = config.rabbitmq.prefix.compra;
+const transacoesPrefix = config.rabbitmq.prefix.transacoes;
 
 @Injectable()
 export class AppService {
@@ -40,7 +41,7 @@ export class AppService {
     this.logger.log(ativo, compraPrefix);
 
     const response = await this.amqpConnection.request({
-      exchange: compraExchange,
+      exchange: brokerExchange,
       routingKey: `${compraPrefix}.${ativo}`,
       payload: compraRequest,
     });
@@ -58,7 +59,7 @@ export class AppService {
     this.logger.log(ativo, vendaPrefix);
 
     const response = await this.amqpConnection.request({
-      exchange: vendaExchange,
+      exchange: brokerExchange,
       routingKey: `${vendaPrefix}.${ativo}`,
       payload: vendaRequest,
     });
@@ -67,12 +68,15 @@ export class AppService {
   }
 
   @RabbitSubscribe({
-    exchange: transacoesExchange,
+    exchange: bolsaExchange,
     routingKey: `${transacoesPrefix}.*`,
   })
   novaTransacao(message: string, amqpMsg) {
     this.logger.log(message, 'Novo Socket');
-    this.socket.onTransaction({ ativo: this.getAtivoFromRoutingKey(amqpMsg.fields.routingKey), message });
+    this.socket.onTransaction({
+      ativo: this.getAtivoFromRoutingKey(amqpMsg.fields.routingKey),
+      message,
+    });
   }
 
   private getAtivoFromRoutingKey(routingKey: string): string {

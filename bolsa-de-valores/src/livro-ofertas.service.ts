@@ -5,12 +5,9 @@ import { Injectable } from '@nestjs/common';
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 import configuration from './configuration/configuration';
 
-// TO DO -> Vamos vericar se o mesmo usario esta fazendo um update
-// TO DO -> So fazer compra ou venda quando uma das duas fecharem
-
 const config = configuration();
 
-const transacoesExchange = config.rabbitmq.exchanges.transacoes;
+const bolsaExchange = config.rabbitmq.exchanges.bolsaDeValores;
 const transacoesPrefix = config.rabbitmq.prefix.transacoes;
 
 @Injectable()
@@ -106,7 +103,7 @@ export class LivroOfertasService {
     if (transacoes.length > 0) {
       transacoes.forEach((transacao) =>
         this.amqpConnection.publish(
-          transacoesExchange,
+          bolsaExchange,
           `${transacoesPrefix}.${ativo}`,
           transacao,
         ),

@@ -4,34 +4,31 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 export const rabbitMQConfig = {
   imports: [ConfigModule],
   useFactory: async (configService: ConfigService): Promise<RabbitMQConfig> => {
-    const compraExchange = configService.get<string>(
-      'rabbitmq.exchanges.compra',
+    const brokerExchange = configService.get<string>(
+      'rabbitmq.exchanges.broker',
     );
-    const vendaExchange = configService.get<string>('rabbitmq.exchanges.venda');
-    const transacoesExchange = configService.get<string>(
-      'rabbitmq.exchanges.transacoes',
+    const bolsaExchange = configService.get<string>(
+      'rabbitmq.exchanges.bolsaDeValores',
     );
+
     const user = configService.get<string>('rabbitmq.user');
     const password = configService.get<string>('rabbitmq.password');
     const url = configService.get<string>('rabbitmq.url');
-    const port = configService.get<string>('rabbitmq.port');
+
+    const amqpUrl = configService.get<string>('rabbitmq.amqpUrl');
 
     return {
       exchanges: [
         {
-          name: compraExchange,
+          name: brokerExchange,
           type: 'topic',
         },
         {
-          name: vendaExchange,
+          name: bolsaExchange,
           type: 'topic',
-        },
-        {
-          name: transacoesExchange,
-          type: 'fanout',
         },
       ],
-      uri: `amqp://${user}:${password}@${url}:${port}`,
+      uri: amqpUrl || `amqp://${user}:${password}@${url}`,
     };
   },
   inject: [ConfigService],
