@@ -7,6 +7,12 @@ import { ConfigurationModule } from './configuration/configuration.module';
 import { ConfigModule } from '@nestjs/config';
 import { SocketGateway } from './socket.gateway';
 
+/**
+ * @class Module
+ * @description
+ * Essa é a classe principal do serviço onde define o modulo principal.
+ * usado no bootstrap.
+*/
 @Module({
   imports: [
     ConfigModule,

@@ -18,6 +18,12 @@ const vendaPrefix = config.rabbitmq.prefix.venda;
 const compraExchange = config.rabbitmq.exchanges.compra;
 const compraPrefix = config.rabbitmq.prefix.compra;
 
+/**
+ * @class AppService
+ * @description 
+ * Classe serve para instaciar os serviços da corretora.
+*/
+
 @Injectable()
 export class AppService {
   private readonly indexOfAtivo = 1;
@@ -30,6 +36,15 @@ export class AppService {
     this.logger = new Logger(corretora);
   }
 
+  /**
+   * @function compra
+   * @param quantidade
+   * @param valor
+   * @param ativo
+   * @description
+   * Metodo recebe os parametros para fazer uma compra, após  envia a mensagem de compra
+   * para a bolsa de valores e receber a resposta ser compra foi feita ou não.
+  */
   async compra({ quantidade, valor, ativo }: ClientCompraDto) {
     const compraRequest: BolsaCompraDto = {
       corretora,
@@ -48,6 +63,15 @@ export class AppService {
     return response;
   }
 
+    /**
+   * @function venda
+   * @param quantidade
+   * @param valor
+   * @param ativo
+   * @description
+   * Metodo recebe os parametros para fazer uma venda, após  envia a mensagem de venda
+   * para a bolsa de valores e receber a resposta ser venda foi feita ou não.
+  */
   async venda({ quantidade, valor, ativo }: ClientVendaDto) {
     const vendaRequest: BolsaVendaDto = {
       corretora: corretora,
@@ -66,6 +90,14 @@ export class AppService {
     return response;
   }
 
+    /**
+   * @function novaTransacao
+   * @param message
+   * @param amqpMsg
+   * @description
+   * Metodo serve para receber a mensagem de transação feita e transmitir via websocket
+   * a transação.
+  */
   @RabbitSubscribe({
     exchange: transacoesExchange,
     routingKey: `${transacoesPrefix}.*`,
@@ -75,6 +107,12 @@ export class AppService {
     this.socket.onTransaction({ ativo: this.getAtivoFromRoutingKey(amqpMsg.fields.routingKey), message });
   }
 
+  /**
+   * @function getAtivoFromRoutingKey 
+   * @param routingKey
+   * @description
+   * Metodo serve para pegar o ativo que vem o parametro routingKey.
+  */
   private getAtivoFromRoutingKey(routingKey: string): string {
     return routingKey.split('.')[this.indexOfAtivo];
   }

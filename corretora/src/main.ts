@@ -6,6 +6,10 @@ import { AppModule } from './app.module';
 
 const logger = new Logger('Main');
 
+/**
+ * @function bootstrap
+ * Essa função serve para iniciar o servidor.
+*/
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
