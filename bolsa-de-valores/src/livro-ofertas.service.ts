@@ -5,11 +5,21 @@ import { Injectable } from '@nestjs/common';
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 import configuration from './configuration/configuration';
 
+/**
+ * @init
+ * inicializa variáveis de ambiente
+ */
 const config = configuration();
 
 const bolsaExchange = config.rabbitmq.exchanges.bolsaDeValores;
 const transacoesPrefix = config.rabbitmq.prefix.transacoes;
 
+/**
+ * @class LivroOfertasService
+ * @description
+ * Essa classe server para salvar as comprar e vendas que ainda não foram feitas.
+ * Além disso ela tem o metodo que verifica se vai haver um a transaçaõ ou não.
+ */
 @Injectable()
 export class LivroOfertasService {
   Map_de_compra = new Map<string, CompraDto[]>();
@@ -18,6 +28,14 @@ export class LivroOfertasService {
 
   constructor(private readonly amqpConnection: AmqpConnection) {}
 
+  /**
+   * @function addCompra
+   * @param compra
+   * @param ativo
+   * @description
+   * Metodo serve para adicionar uma nova compra a na lista de salvando no Map
+   * de compra.
+   */
   addCompra(compra: CompraDto, ativo: string): void {
     const listaAtivo = this.Map_de_compra.get(ativo);
 
@@ -32,6 +50,14 @@ export class LivroOfertasService {
     return;
   }
 
+  /**
+   * @function addVenda
+   * @param venda
+   * @param ativo
+   * @description
+   * Metodo serve para adicionar uma nova compra a na lista de salvando no Map
+   * de venda.
+   */
   addVenda(venda: VendaDto, ativo: string): void {
     const listaAtivo = this.Map_de_venda.get(ativo);
 
@@ -46,35 +72,49 @@ export class LivroOfertasService {
     return;
   }
 
+  /**
+   * @function addVenda
+   * @param ativo
+   * @description
+   * Metodo principal da classe. Ele serve para verificar se tem um compra e venda
+   * valida para ocorrer uma transação. O metodo passa por toda lista de venda,
+   * verificando se existe compra que case com a venda e salva a transação caso
+   * ocorra.
+   */
   verifica(ativo: string): TransacaoDto[] {
-    const lista_ativo_venda = this.Map_de_venda.get(ativo);
-    const lista_ativo_compra = this.Map_de_compra.get(ativo);
+    const lista_ativo_venda = this.Map_de_venda.get(ativo); // Pega a lista de venda de determindo ativo
+    const lista_ativo_compra = this.Map_de_compra.get(ativo); // Pega a lista de venda de determindo ativo
 
-    const transacoes: TransacaoDto[] = [];
+    const transacoes: TransacaoDto[] = []; //Inicia a lista de transações
 
     if (!lista_ativo_venda || !lista_ativo_compra) {
+      //Verifica se exite a lista de venda e compra
       return transacoes;
     }
 
     lista_ativo_venda.forEach((venda) => {
+      // Percorre a lista de venda
       let fazerMaisCompra = true;
 
       while (venda.quantidade > 0 && fazerMaisCompra) {
+        // Verifica se ainda pode-se fazer uma transação coma venda
         const compra = this.Map_de_compra.get(ativo).find(
+          // Encontra a primeira compra que seja valida para fazer a transação
           (compra) => compra.valor >= venda.valor,
         );
 
-        fazerMaisCompra = !!compra;
+        fazerMaisCompra = !!compra; // Verifica se exite uma compra ou não, retornando um boolean
 
         if (fazerMaisCompra) {
-          const caso = this.achaCaso(compra, venda);
+          // Verifica se foi encontrada alguma compra valida
+          const caso = this.achaCaso(compra, venda); // Acho o caso menor, maior ou igual na relação entre compra e venda
 
           switch (caso) {
             case 'compra_menor_venda':
               transacoes.push(
                 this.salvaTransacao(compra, venda, compra.quantidade),
               );
-              venda.quantidade -= compra.quantidade;
+              venda.quantidade -= compra.quantidade; // Salva a nova qunatidade de venda
               compra.quantidade = 0;
               this.limpaListaQuantidadeZerada(this.Map_de_compra, ativo);
               break;
@@ -91,7 +131,7 @@ export class LivroOfertasService {
               transacoes.push(
                 this.salvaTransacao(compra, venda, venda.quantidade),
               );
-              compra.quantidade -= venda.quantidade;
+              compra.quantidade -= venda.quantidade; // Salva a nova qunatidade de compra
               venda.quantidade = 0;
               this.limpaListaQuantidadeZerada(this.Map_de_venda, ativo);
               break;
@@ -101,6 +141,7 @@ export class LivroOfertasService {
     });
 
     if (transacoes.length > 0) {
+      // Verifica se alguma transaçaõ foi feita
       transacoes.forEach((transacao) =>
         this.amqpConnection.publish(
           bolsaExchange,
@@ -113,6 +154,13 @@ export class LivroOfertasService {
     return transacoes;
   }
 
+  /**
+   * @function limpaListaQuantidadeZerada
+   * @param map
+   * @param ativo
+   * @description
+   * Metodo server para limpar a lista que tenha a quantidade zerada.
+   */
   private limpaListaQuantidadeZerada(
     map: Map<string, CompraDto[] | VendaDto[]>,
     ativo: string,
@@ -129,6 +177,14 @@ export class LivroOfertasService {
     map.set(ativo, nova_lista);
   }
 
+  /**
+   * @function achaCaso
+   * @param compra
+   * @param venda
+   * @description
+   * Metodo server para achar o caso de menor, maior ou igual na difirença entre
+   * compra e venda, retorando o caso.
+   */
   private achaCaso(compra: CompraDto, venda: VendaDto) {
     const diferenca_compra_venda = compra.quantidade - venda.quantidade;
 
@@ -140,6 +196,14 @@ export class LivroOfertasService {
     return 'compra_maior_venda';
   }
 
+  /**
+   * @function achaCaso
+   * @param compra
+   * @param venda
+   * @description
+   * Metodo server para salvar a transação a Lista_de_transações da clase e retorna
+   * a transação que foi feita.
+   */
   private salvaTransacao(
     compra: CompraDto,
     venda: VendaDto,

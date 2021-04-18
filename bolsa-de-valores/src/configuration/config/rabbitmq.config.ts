@@ -1,6 +1,11 @@
 import { RabbitMQConfig } from '@golevelup/nestjs-rabbitmq';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
+/**
+ * @function
+ * Inicializa os dados da conexão com o RabbitMQ utilizando as
+ * variáveis de ambiente.
+ */
 export const rabbitMQConfig = {
   imports: [ConfigModule],
   useFactory: async (configService: ConfigService): Promise<RabbitMQConfig> => {
