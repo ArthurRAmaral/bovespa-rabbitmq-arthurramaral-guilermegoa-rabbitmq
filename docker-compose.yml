@@ -1,19 +1,27 @@
 version: '3.2'
 
 services:
-  api-gateway:
-    image: api-gateway
-    build: ./api-gateway
-    volumes:
-      - ./api-gateway:/home/node/app
+  corretora1:
+    image: corretora
+    build: ./corretora
     ports:
-      - '3333:3333'
+      - 3001:${PORT:-3333}
+    environment:
+      - NOME_CORRETORA=${NOME_CORRETORA:-COR1}
+      - AMQP_URL=${AMQP_URL:-amqps://guest:guest@rabbitmq:5672}
+    volumes:
+      - ./corretora:/home/node/app
     depends_on:
       - rabbitmq
 
-  corretora:
+  corretora2:
     image: corretora
     build: ./corretora
+    ports:
+      - 3002:${PORT:-3333}
+    environment:
+      - NOME_CORRETORA=${NOME_CORRETORA:-COR2}
+      - AMQP_URL=${AMQP_URL:-amqps://guest:guest@rabbitmq:5672}
     volumes:
       - ./corretora:/home/node/app
     depends_on:
@@ -22,6 +30,8 @@ services:
   bolsa-de-valores:
     image: bolsa-de-valores
     build: ./bolsa-de-valores
+    environment:
+      - AMQP_URL=${AMQP_URL:-amqps://guest:guest@rabbitmq:5672}
     volumes:
       - ./bolsa-de-valores:/home/node/app
     depends_on:
@@ -33,18 +43,18 @@ services:
       driver: none
     container_name: 'rabbitmq'
     ports:
-      - 5672:5672
+      - ${RMQ_PORT:-5672}:${RMQ_PORT:-5672}
       - 15672:15672
     volumes:
-      - rabbitmq-data:/var/lib/rabbitmq/
+      - rabbitmq-data:/var/lib/rabbitmq
       - rabbitmq-log:/var/log/rabbitmq
 
 volumes:
   rabbitmq-data:
-    name: rmqdata
+#     name: rmqdata
   rabbitmq-log:
-    name: rmqlog
+#     name: rmqlog
 
 networks:
   default:
-    name: rabbitmq
+    name: bovespa

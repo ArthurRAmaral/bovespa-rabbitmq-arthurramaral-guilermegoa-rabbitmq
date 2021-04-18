@@ -1,21 +1,21 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { Transport } from '@nestjs/microservices';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 import { AppModule } from './app.module';
 
 const logger = new Logger('Main');
 
+/**
+ * @function bootstrap
+ * Essa função serve para iniciar o servidor.
+*/
 async function bootstrap() {
-  const app = await NestFactory.createMicroservice(AppModule, {
-    transport: Transport.RMQ,
-    options: {
-      urls: ['amqp://guest:guest@rabbitmq:5672/bovespa'],
-      queue: 'corretora',
-      queueOptions: {
-        durable: true,
-      },
-    },
-  });
-  app.listen(() => logger.log('Listening'));
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  app.setBaseViewsDir(join(__dirname, '..', 'views'));
+  app.setViewEngine('hbs');
+
+  app.listen(3333, () => logger.log('Listening'));
 }
 bootstrap();
