@@ -60,7 +60,7 @@ A Bolsa tem a função de processar e salvar o pedido de compra e venda e salvar
 
 ## Diagrama de componentes
 
-> TO DO
+<img src="./imgs/diagrama_de_componentes.png" style="margin-left: 24px;" />
 
 ---
 
