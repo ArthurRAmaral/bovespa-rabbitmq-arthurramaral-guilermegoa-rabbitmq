@@ -1,6 +1,7 @@
 version: '3.2'
 
 services:
+  # Cria a corretora 1 COR1 e recebe um amqp url para conectar ao rabbitmq
   corretora1:
     image: corretora
     build: ./corretora
@@ -14,6 +15,7 @@ services:
     depends_on:
       - rabbitmq
 
+  # Cria a corretora 2 COR2 e recebe um amqp url para conectar ao rabbitmq
   corretora2:
     image: corretora
     build: ./corretora
@@ -27,6 +29,7 @@ services:
     depends_on:
       - rabbitmq
 
+  #Cria a bolsa de valores e recebe um amqp url para conectar ao rabbitmq
   bolsa-de-valores:
     image: bolsa-de-valores
     build: ./bolsa-de-valores
@@ -37,24 +40,22 @@ services:
     depends_on:
       - rabbitmq
 
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    logging:
-      driver: none
-    container_name: 'rabbitmq'
-    ports:
-      - ${RMQ_PORT:-5672}:${RMQ_PORT:-5672}
-      - 15672:15672
-    volumes:
-      - rabbitmq-data:/var/lib/rabbitmq
-      - rabbitmq-log:/var/log/rabbitmq
+  # Cria o rabbitmq que pode ser acessado pelo dominio 'rabbitmq' dentro dos
+  # outros containers
 
-volumes:
-  rabbitmq-data:
+  # rabbitmq:
+  #   image: rabbitmq:3-management-alpine
+  #   logging:
+  #     driver: none
+  #   container_name: 'rabbitmq'
+  #   ports:
+  #     - ${RMQ_PORT:-5672}:${RMQ_PORT:-5672}
+  #     - 15672:15672
+  #   volumes:
+  #     - rabbitmq-data:/var/lib/rabbitmq
+  #     - rabbitmq-log:/var/log/rabbitmq
+# volumes:
+# rabbitmq-data:
 #     name: rmqdata
-  rabbitmq-log:
+# rabbitmq-log:
 #     name: rmqlog
-
-networks:
-  default:
-    name: bovespa
