@@ -42,20 +42,19 @@ services:
 
   # Cria o rabbitmq que pode ser acessado pelo dominio 'rabbitmq' dentro dos
   # outros containers
-
-  # rabbitmq:
-  #   image: rabbitmq:3-management-alpine
-  #   logging:
-  #     driver: none
-  #   container_name: 'rabbitmq'
-  #   ports:
-  #     - ${RMQ_PORT:-5672}:${RMQ_PORT:-5672}
-  #     - 15672:15672
-  #   volumes:
-  #     - rabbitmq-data:/var/lib/rabbitmq
-  #     - rabbitmq-log:/var/log/rabbitmq
-# volumes:
-# rabbitmq-data:
-#     name: rmqdata
-# rabbitmq-log:
-#     name: rmqlog
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    logging:
+      driver: none
+    container_name: 'rabbitmq'
+    ports:
+      - ${RMQ_PORT:-5672}:${RMQ_PORT:-5672}
+      - 15672:15672
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+      - rabbitmq-log:/var/log/rabbitmq
+volumes:
+rabbitmq-data:
+  name: rmqdata
+rabbitmq-log:
+  name: rmqlog

@@ -48,7 +48,7 @@ O rabbitMq é inicado para ser feita a comunição entre a bolsa de valores e a 
 
 ## NestJs
 
-#### Corretora 
+#### Corretora
 
 A corretora tem função de fazer a conexao como cliente e a bolsa de valores. Dessa forma, ela usa do serviço do rabbitMq para fazer a conexão artaves de mesangens, as quais podem ser de venda e compra. Assim, sendo salvas no em cache e quando ocorre a compatibilidade entre uma compra e venda, ocorre uma transação, onde a bolsa recebe que ocorreu essa transaçãoe transmite via web socket para o front.
 
@@ -56,7 +56,7 @@ Esse é o serviço que disponibiliza o html para o teste.
 
 #### Bolsa de valores
 
-A Bolsa tem a função de processar e salvar o pedido de compra e venda e salvar no livro de ofertas, o qual tem o intuito de verificar se ocorre uma compra.  
+A Bolsa tem a função de processar e salvar o pedido de compra e venda e salvar no livro de ofertas, o qual tem o intuito de verificar se ocorre uma compra.
 
 ## Diagrama de componentes
 
@@ -71,7 +71,9 @@ A Bolsa tem a função de processar e salvar o pedido de compra e venda e salvar
 
 ## Como usar
 
-Para ultilizar basta roda o comando abaixo.
+Para escolher qual instância do RabbitMQ deseja usar insira o amqp url no `.env` para que os todos possam se conectar mo mesmo serviço. Caso queria utilizar o RabbitMQ criado no próprio docker compose, deixe o `.env` vazio.
+
+Para executar basta roda o comando abaixo na raiz do projeto.
 
 ```sh
 docker-compose up
