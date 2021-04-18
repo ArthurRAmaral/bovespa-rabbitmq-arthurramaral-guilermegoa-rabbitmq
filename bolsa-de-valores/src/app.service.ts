@@ -16,7 +16,8 @@ const compraPrefix = config.rabbitmq.prefix.compra;
 const vendaPrefix = config.rabbitmq.prefix.venda;
 
 /**
- * @class
+ * @class AppService
+ * @description
  * Essa é a classe é serviço pricipal da aplicação que conecta as filas
  * da exchange BROKER do RabbitMQ e ecaminha para o serviço específico.
  */
@@ -28,14 +29,13 @@ export class AppService {
   constructor(private livroDeOfertas: LivroOfertasService) {}
 
   /**
-   * @function
+   * @function compra
+   * @param compraDto recebe o corpo da requisição com os dados da
+   * compra do ativo 
+   * @param amqpMsg recebe os dados da mensagem para pegar o ativo
+   * @description
    * Esse método e acionado quando chega uma mensagem, na exchange
    * BROCKER, de tópico com a binding key compra.ativo.
-   * 
-   * @param compraDto recebe o corpo da requisição com os dados da
-   * compra do ativo
-   * 
-   * @param amqpMsg recebe os dados da mensagem para pegar o ativo
    */
   @RabbitRPC({
     exchange: brokerExchange,
@@ -57,14 +57,13 @@ export class AppService {
   }
 
   /**
-   * @function
-   * Esse método e acionado quando chega uma mensagem, na exchange
-   * BROCKER, de tópico com a binding key venda.ativo.
-   * 
+   * @function venda
    * @param vendaDto recebe o corpo da requisição com os dados da
    * venda do ativo
-   * 
    * @param amqpMsg recebe os dados da mensagem para pegar o ativo
+   * @description
+   * Esse método e acionado quando chega uma mensagem, na exchange
+   * BROCKER, de tópico com a binding key venda.ativo.
    */
   @RabbitRPC({
     exchange: brokerExchange,
@@ -86,10 +85,10 @@ export class AppService {
   }
 
   /**
-   * @function
-   * Esse método retorna o nome do ativo;
-   * 
+   * @function getAtivoFromRoutingKey
    * @param compraDto recebe o routingKey para poder retirar o noe do ativo
+   * @description
+   * Esse método retorna o nome do ativo;
    */
   private getAtivoFromRoutingKey(routingKey: string): string {
     return routingKey.split('.')[this.indexOfAtivo];

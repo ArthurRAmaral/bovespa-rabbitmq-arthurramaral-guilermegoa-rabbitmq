@@ -2,7 +2,7 @@ import { RabbitMQConfig } from '@golevelup/nestjs-rabbitmq';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
 /**
- * @function
+ * @constant rabbitMQConfig
  * Inicializa os dados da conexão com o RabbitMQ utilizando as
  * variáveis de ambiente.
  */

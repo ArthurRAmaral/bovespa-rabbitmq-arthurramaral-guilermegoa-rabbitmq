@@ -5,7 +5,7 @@ import * as dotenv from 'dotenv';
  * @default
  * @description
  * Metodo serve iniciar as as variaveis de ambiente que serrão consumidas no serviço
-*/
+ */
 export default () => {
   dotenv.config();
   return {

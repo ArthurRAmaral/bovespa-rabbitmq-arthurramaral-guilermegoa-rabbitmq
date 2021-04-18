@@ -6,7 +6,8 @@ import { LivroOfertasService } from './livro-ofertas.service';
 import { ConfigurationModule } from './configuration/configuration.module';
 
 /**
- * @class
+ * @class AppModile
+ * @description
  * Essa é a classe principal do serviço onde define o modulo principal
  * usado no bootstrap.
  */
