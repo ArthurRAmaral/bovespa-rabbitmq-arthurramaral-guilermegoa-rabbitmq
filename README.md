@@ -58,6 +58,10 @@ Esse é o serviço que disponibiliza o html para o teste.
 
 A Bolsa tem a função de processar e salvar o pedido de compra e venda e salvar no livro de ofertas, o qual tem o intuito de verificar se ocorre uma compra.
 
+## Diagrama de classes
+
+<img src="./imgs/diagramas_de_classes.jpg" style="margin-left: 24px;" />
+
 ## Diagrama de componentes
 
 <img src="./imgs/diagrama_de_componentes.png" style="margin-left: 24px;" />
