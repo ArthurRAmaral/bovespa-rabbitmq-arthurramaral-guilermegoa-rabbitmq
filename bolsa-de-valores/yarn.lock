@@ -385,21 +385,21 @@
   dependencies:
     lodash "^4.17.15"
 
-"@golevelup/nestjs-modules@^0.4.1":
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/@golevelup/nestjs-modules/-/nestjs-modules-0.4.1.tgz#e24bfa607b715d4df280de9ebcc52f7121cd48f7"
-  integrity sha512-v2GYGtJ8moTfhehavNFBwnHQ+QcgYHssxfqbJZcY4CUqB97E2sWmnAmtgscHDTvHqABOCaq2xvwfw4YTwZU2Ug==
+"@golevelup/nestjs-modules@^0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@golevelup/nestjs-modules/-/nestjs-modules-0.4.2.tgz#e42a4e2fb4508089dce602da737bf204dd883347"
+  integrity sha512-p630V8641D6yh+YXTV6idAEAoJPOWQAiKSYH2i9BsON0l/+CRBtDV1vudbWOPBOmf3++Hm+7um+0gTS8uZeEXw==
   dependencies:
     shortid "^2.2.14"
 
-"@golevelup/nestjs-rabbitmq@^1.16.1":
-  version "1.16.1"
-  resolved "https://registry.yarnpkg.com/@golevelup/nestjs-rabbitmq/-/nestjs-rabbitmq-1.16.1.tgz#0d97145ac5b2115e289acdeee56feade41639c69"
-  integrity sha512-+5rss427yqPbvtIZxQUdjvaXe0Xtq6tE/PVmkHgPETEVDZY+DfqQSYiL/E3QPfFzCytiYxBTSlQZZVjUaNV8Cg==
+"@golevelup/nestjs-rabbitmq@^1.17.1":
+  version "1.17.1"
+  resolved "https://registry.yarnpkg.com/@golevelup/nestjs-rabbitmq/-/nestjs-rabbitmq-1.17.1.tgz#72eec606e195734bc696582b19e5be5c486a1e2a"
+  integrity sha512-sBfc+/8KNr9jZpKq421jA3cRCBcCxYX9M7yIyOhSh2mV1eTROUz1i6zyr6Fp/RuvtxG4LgZulq6R3SeY6xQJJg==
   dependencies:
     "@golevelup/nestjs-common" "^1.4.2"
     "@golevelup/nestjs-discovery" "^2.3.1"
-    "@golevelup/nestjs-modules" "^0.4.1"
+    "@golevelup/nestjs-modules" "^0.4.2"
     amqp-connection-manager "^3.0.0"
     amqplib "^0.7.1"
     uuid "^3.3.2"
