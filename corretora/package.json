@@ -31,7 +31,7 @@
     "@nestjs/platform-socket.io": "^7.6.15",
     "@nestjs/websockets": "^7.6.15",
     "@types/socket.io": "^2.1.13",
-    "amqp-connection-manager": "^3.2.2",
+    "amqp-connection-manager": "^3.6.0",
     "amqplib": "^0.7.1",
     "dotenv": "^8.2.0",
     "hbs": "^4.1.2",
